@@ -9,54 +9,54 @@ end;;
 
 module type CFT =
 sig
-  type elt
+  type t
   val carac : int
   val dim : int
   val cardinal : int
-  val zero : elt
-  val elt_of_int : int -> elt
-  val int_of_elt : elt -> int
-  val un : elt
-  val alpha : elt
-  val add : elt -> elt -> elt
-  val sub : elt -> elt -> elt
-  val opp : elt -> elt
-  val mult : elt -> elt -> elt
-  val inv : elt -> elt
-  val div : elt -> elt -> elt
-  val pow : elt -> int -> elt
-  val print : elt -> unit
+  val zero : t
+  val of_int : int -> t
+  val to_int : t -> int
+  val un : t
+  val alpha : t
+  val add : t -> t -> t
+  val sub : t -> t -> t
+  val opp : t -> t
+  val mult : t -> t -> t
+  val inv : t -> t
+  val div : t -> t -> t
+  val pow : t -> int -> t
+  val print : t -> unit
   val print_table : unit -> unit
-  val random : unit -> elt
+  val random : unit -> t
 end ;;
 
 module type ExtFuncT =
   functor (CorpsBase : CFT) -> functor (Taille : TT) ->
   sig
-    type elt
+    type t
     exception ExtraireImpossible
     val carac : int
     val dim : int
     val cardinal : int
-    val zero : elt
-    val elt_of_int : int -> elt
-    val int_of_elt : elt -> int
-    val list_of_elt : elt -> int list
-    val elt_of_list_int : int list -> elt
-    val extraire : elt -> CorpsBase.elt
-    val incorporer : CorpsBase.elt -> elt
-    val un : elt
-    val alpha : elt
-    val add : elt -> elt -> elt
-    val sub : elt -> elt -> elt
-    val opp : elt -> elt
-    val mult : elt -> elt -> elt
-    val inv : elt -> elt
-    val div : elt -> elt -> elt
-    val pow : elt -> int -> elt
-    val print : elt -> unit
+    val zero : t
+    val of_int : int -> t
+    val to_int : t -> int
+    val to_list : t -> int list
+    val elt_of_list_int : int list -> t
+    val extraire : t -> CorpsBase.t
+    val incorporer : CorpsBase.t -> t
+    val un : t
+    val alpha : t
+    val add : t -> t -> t
+    val sub : t -> t -> t
+    val opp : t -> t
+    val mult : t -> t -> t
+    val inv : t -> t
+    val div : t -> t -> t
+    val pow : t -> int -> t
+    val print : t -> unit
     val print_table : unit -> unit
-    val random : unit -> elt
+    val random : unit -> t
   end ;;
 
 module ExtensionOpt : ExtFuncT = 
@@ -104,12 +104,12 @@ module ExtensionOpt : ExtFuncT =
       let int_of_poly u =
         let rec aux acc k = function
           |[] -> acc
-          |a :: s -> aux ((CorpsBase.int_of_elt a)*k + acc) (k * CorpsBase.cardinal) s
+          |a :: s -> aux ((CorpsBase.to_int a)*k + acc) (k * CorpsBase.cardinal) s
         in
         aux 0 1 (Poly.list_of_poly u)
 
       let list_of_poly u =
-        List.map CorpsBase.int_of_elt (Poly.list_of_poly u)
+        List.map CorpsBase.to_int (Poly.list_of_poly u)
 
       let tables =
         let tmul = Array.make cardinal Poly.nul in
@@ -137,7 +137,7 @@ module ExtensionOpt : ExtFuncT =
         let c = CorpsBase.cardinal in
         let rec aux = function
           | 0 -> []
-          | k -> CorpsBase.elt_of_int (k mod c) :: aux (k / c)
+          | k -> CorpsBase.of_int (k mod c) :: aux (k / c)
         in 
         Poly.poly_of_list (aux j)
 
@@ -149,24 +149,24 @@ module ExtensionOpt : ExtFuncT =
         m @ (aux (dim-(List.length m)))
     end
 
-    type elt = {
+    type t = {
       rep_cycl : IntExt.t ;
-      rep_poly : Poly.poly ;
+      rep_poly :  Poly.t ;
     }
 
-    let int_of_elt a =
+    let to_int a =
       let p = a.rep_poly in
       Conv.int_of_poly p
 
-    let list_of_elt a =
+    let to_list a =
       Conv.completer (Conv.list_of_poly a.rep_poly)
 
     let elt_of_list_int l = 
-      let p = Poly.normalise (Poly.poly_of_list (List.map CorpsBase.elt_of_int l)) in
+      let p = Poly.normalise (Poly.poly_of_list (List.map CorpsBase.of_int l)) in
       let c = Conv.cycl_of_poly p in
       { rep_poly = p ; rep_cycl = c }
 
-    let elt_of_int j = 
+    let of_int j = 
       let p = Conv.poly_of_int j in
       { rep_poly = p ; rep_cycl = Conv.cycl_of_poly p }
 
@@ -253,7 +253,7 @@ module ExtensionNonOpt : ExtFuncT =
     module Cz = Cantorzass.Cantorzass(Poly)
     module Cyclo = Cyclo.Cyclo(Poly)
     exception ExtraireImpossible
-    type elt = Poly.poly
+    type t =  Poly.t
     let carac = CorpsBase.carac
     let dim = Taille.dim
 
@@ -268,18 +268,18 @@ module ExtensionNonOpt : ExtFuncT =
       let int_of_poly u =
         let rec aux acc k = function
           |[] -> acc
-          |a :: s -> aux (CorpsBase.int_of_elt a * k + acc) (k * CorpsBase.cardinal) s
+          |a :: s -> aux (CorpsBase.to_int a * k + acc) (k * CorpsBase.cardinal) s
         in
         aux 0 1 (Poly.list_of_poly u)
 
       let list_of_poly u =
-        List.map CorpsBase.int_of_elt (Poly.list_of_poly u)
+        List.map CorpsBase.to_int (Poly.list_of_poly u)
 
       let poly_of_int j = 
         let c = CorpsBase.cardinal in
         let rec aux = function
           | 0 -> []
-          | k -> CorpsBase.elt_of_int (k mod c) :: aux (k / c)
+          | k -> CorpsBase.of_int (k mod c) :: aux (k / c)
         in 
         Poly.poly_of_list (aux j)
 
@@ -293,12 +293,12 @@ module ExtensionNonOpt : ExtFuncT =
 
     end
 
-    let int_of_elt a = Conv.int_of_poly a
-    let list_of_elt a = Conv.completer (Conv.list_of_poly a)
+    let to_int a = Conv.int_of_poly a
+    let to_list a = Conv.completer (Conv.list_of_poly a)
 
-    let elt_of_list_int l = Poly.normalise (Poly.poly_of_list (List.map CorpsBase.elt_of_int l))
+    let elt_of_list_int l = Poly.normalise (Poly.poly_of_list (List.map CorpsBase.of_int l))
 
-    let elt_of_int j = Conv.poly_of_int j
+    let of_int j = Conv.poly_of_int j
 
     let zero = Poly.nul
     let un = Poly.un

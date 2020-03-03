@@ -1,26 +1,26 @@
 module type FrobT =
 sig
-  type elt
-  val zero : elt
-  val un : elt
-  val alpha : elt
+  type t
+  val zero : t
+  val un : t
+  val alpha : t
   val carac : int
   val dim : int
   val cardinal : int
-  val int_of_elt : elt -> int
-  val elt_of_int : int -> elt
-  val list_of_elt : elt -> int list
-  val elt_of_list_int : int list -> elt
-  val print : elt -> unit
+  val to_int : t -> int
+  val of_int : int -> t
+  val to_list : t -> int list
+  val elt_of_list_int : int list -> t
+  val print : t -> unit
   val print_table : unit -> unit
-  val add : elt -> elt -> elt
-  val sub : elt -> elt -> elt
-  val opp : elt -> elt
-  val mult : elt -> elt -> elt
-  val inv : elt -> elt
-  val div : elt -> elt -> elt
-  val pow : elt -> int -> elt
-  val random : unit -> elt
+  val add : t -> t -> t
+  val sub : t -> t -> t
+  val opp : t -> t
+  val mult : t -> t -> t
+  val inv : t -> t
+  val div : t -> t -> t
+  val pow : t -> int -> t
+  val random : unit -> t
 end
 
 module Frobenius( Taille : sig val carac : int end ) : FrobT =
@@ -32,13 +32,13 @@ struct
       (d, v, u - (a / b) * v)
 
   (** la fonction bezout manipule bien des entiers,
-      			mais la fonction "inverse" prend des elt, les convertit
+      			mais la fonction "inverse" prend des t, les convertit
       			en entiers pour bezout, puis convertit le resultat 
-      			de bezout en elt *)
-  type elt = int
-  let zero : elt = 0
-  let un : elt = 1
-  let alpha : elt = (if Taille.carac= 2 then 1 else if Taille.carac=3 then 2 else 3)
+      			de bezout en t *)
+  type t = int
+  let zero : t = 0
+  let un : t = 1
+  let alpha : t = (if Taille.carac= 2 then 1 else if Taille.carac=3 then 2 else 3)
   let carac = Taille.carac and dim = 1
   let cardinal = carac
 
@@ -48,38 +48,38 @@ struct
     | [a] -> a
     | _ -> failwith "element of list int : Frob"
 
-  let list_of_elt a =
+  let to_list a =
     [a]
 
   let ( % ) a b =
-    let x : elt = a mod b in
+    let x : t = a mod b in
     if x >= zero then x else b + x 
 
-  let elt_of_int i = match i mod carac with
-    | x when x >= 0 -> let y : elt = x in y
-    | x -> let y : elt = x + carac in y
+  let of_int i = match i mod carac with
+    | x when x >= 0 -> let y : t = x in y
+    | x -> let y : t = x + carac in y
 
-  let int_of_elt (a : elt) : int = a
+  let to_int (a : t) : int = a
 
-  let print (u:elt) = 
+  let print (u:t) = 
     print_int u;
     print_string "%";
     print_int Taille.carac
 
   let print_table () = ()
 
-  let iso op_int (a : elt) (b : elt) : elt =
-    let x, y = int_of_elt a, int_of_elt b in
-    elt_of_int (op_int x y)
+  let iso op_int (a : t) (b : t) : t =
+    let x, y = to_int a, to_int b in
+    of_int (op_int x y)
 
   let add a b = iso ( + ) a b
   and mult a b = iso ( * ) a b
   and sub a b = iso ( - ) a b
 
-  let inv (a : elt) : elt = 
-    let x = int_of_elt a in
+  let inv (a : t) : t = 
+    let x = to_int a in
     match bezout x carac with
-    | 1, u, _ -> elt_of_int u
+    | 1, u, _ -> of_int u
     | _ -> failwith "elt non inversible"
 
   let opp x = sub zero x
@@ -91,5 +91,5 @@ struct
       | k -> mult a (aux (mult a a) (k / 2))
     in aux a n
 
-  let random () = elt_of_int (Random.int (carac))
+  let random () = of_int (Random.int (carac))
 end ;;

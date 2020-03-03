@@ -1,65 +1,65 @@
 module type CorpsType = 
 sig
-  type elt
+  type t
   val carac : int
   val cardinal : int
   val dim : int
-  val zero : elt
-  val un : elt
-  val random : unit -> elt
-  val print : elt -> unit
-  val opp : elt -> elt
-  val inv : elt -> elt
-  val add : elt -> elt -> elt
-  val mult : elt -> elt -> elt
-  val sub : elt -> elt -> elt
-  val div : elt -> elt -> elt
-  val pow : elt -> int -> elt
+  val zero : t
+  val un : t
+  val random : unit -> t
+  val print : t -> unit
+  val opp : t -> t
+  val inv : t -> t
+  val add : t -> t -> t
+  val mult : t -> t -> t
+  val sub : t -> t -> t
+  val div : t -> t -> t
+  val pow : t -> int -> t
 end ;;
 
 module type PolyFunctorType =
   functor (Corps : CorpsType) ->
   sig
-    type elt = Corps.elt
-    type poly
+    type elt = Corps.t
+    type  t
     val carac : int
     val cardinal : int
-    val poly_of_list : elt list -> poly
-    val list_of_poly : poly -> elt list
-    val nul : poly
-    val un : poly
-    val coef_dom : poly -> elt
-    val map : (elt -> elt) -> poly -> poly
-    val evaluer : poly -> elt -> elt
-    val normalise : poly -> poly
-    val unitaire : poly -> poly
-    val decale : poly -> int -> poly
-    val monome : elt -> int -> poly
-    val reciproque : poly -> poly
-    val coef_constant : poly -> elt
-    val degre : poly -> int
-    val derive : poly -> poly
-    val opp : poly -> poly
-    val add : poly -> poly -> poly
-    val sub : poly -> poly -> poly
-    val mult : poly -> poly -> poly
-    val pow : poly -> int -> poly
-    val powmod : poly -> int -> poly -> poly
-    val division : poly -> poly -> poly * poly
-    val quotient : poly -> poly -> poly
-    val modulo : poly -> poly -> poly
-    val mult_par_scal : poly -> elt -> poly
-    val translate : int -> poly -> poly
-    val pgcd : poly -> poly -> poly
-    val euclide : poly -> poly -> poly * poly * poly
-    val random : int -> poly
-    val print : poly -> unit
+    val poly_of_list : elt list ->  t
+    val list_of_poly :  t -> elt list
+    val nul :  t
+    val un :  t
+    val coef_dom :  t -> elt
+    val map : (elt -> elt) ->  t ->  t
+    val evaluer :  t -> elt -> elt
+    val normalise :  t ->  t
+    val unitaire :  t ->  t
+    val decale :  t -> int ->  t
+    val monome : elt -> int ->  t
+    val reciproque :  t ->  t
+    val coef_constant :  t -> elt
+    val degre :  t -> int
+    val derive :  t ->  t
+    val opp :  t ->  t
+    val add :  t ->  t ->  t
+    val sub :  t ->  t ->  t
+    val mult :  t ->  t ->  t
+    val pow :  t -> int ->  t
+    val powmod :  t -> int ->  t ->  t
+    val division :  t ->  t ->  t *  t
+    val quotient :  t ->  t ->  t
+    val modulo :  t ->  t ->  t
+    val mult_par_scal :  t -> elt ->  t
+    val translate : int ->  t ->  t
+    val pgcd :  t ->  t ->  t
+    val euclide :  t ->  t ->  t *  t *  t
+    val random : int ->  t
+    val print :  t -> unit
   end ;;
 
 module Polynome : PolyFunctorType =
   functor (Corps : CorpsType) ->
   struct
-    type elt = Corps.elt
+    type elt = Corps.t
     let carac = Corps.carac
     let cardinal = Corps.cardinal
     let inv = Corps.inv
@@ -67,7 +67,7 @@ module Polynome : PolyFunctorType =
     let ( *% ) = Corps.mult
     let ( -% ) = Corps.sub
     let ( /% ) = Corps.div
-    type poly = elt list
+    type t = elt list
 
     let un = [Corps.un]
     let nul = []
@@ -161,7 +161,7 @@ module Polynome : PolyFunctorType =
         | e :: _ -> e
       in cherche (List.rev u)
 
-    let division (u : poly) (v : poly) =
+    let division (u :  t) (v :  t) =
       let inv_dom_v = inv (coef_dom v) in
       let deg_v = degre v in
       let rec aux q r =
@@ -240,5 +240,5 @@ module Polynome : PolyFunctorType =
         | -1 -> []
         | k -> Corps.random () :: aux (k - 1) 
       in normalise (aux (n-1))
-      (** renvoie un polynome de degré < n *)
+      (** renvoie un polynome de degrÔøΩ < n *)
   end;;

@@ -1,28 +1,28 @@
 module type PolyCZType =
 sig
-  type poly
+  type t
   val cardinal : int
   val carac : int
-  val nul : poly
-  val un : poly
-  val normalise : poly -> poly
-  val print : poly -> unit
-  val degre : poly -> int
-  val add : poly -> poly -> poly
-  val sub : poly -> poly -> poly
-  val opp : poly -> poly
-  val quotient : poly -> poly -> poly
-  val modulo : poly -> poly -> poly
-  val mult : poly -> poly -> poly
-  val powmod : poly -> int -> poly -> poly
-  val pgcd : poly -> poly -> poly
-  val derive : poly -> poly
-  val random : int -> poly
+  val nul : t
+  val un : t
+  val normalise : t -> t
+  val print : t -> unit
+  val degre : t -> int
+  val add : t -> t -> t
+  val sub : t -> t -> t
+  val opp : t -> t
+  val quotient : t -> t -> t
+  val modulo : t -> t -> t
+  val mult : t -> t -> t
+  val powmod : t -> int -> t -> t
+  val pgcd : t -> t -> t
+  val derive : t -> t
+  val random : int -> t
 end
 
 module Cantorzass (Poly : PolyCZType) =
   (struct
-    type poly = Poly.poly
+    type poly = Poly.t
     let moins_un = Poly.opp Poly.un
 
     let carac =  Poly.carac
@@ -86,7 +86,7 @@ module Cantorzass (Poly : PolyCZType) =
   end
    :
    sig
-     type poly = Poly.poly
+     type poly = Poly.t
      val cantor_zassenhaus : poly -> int -> poly
      val factorisation : poly -> int -> poly list
    end);;

@@ -1,13 +1,13 @@
 
 module type Polynome =
 sig
-  type poly
-  val opp : poly -> poly
-  val translate : int -> poly -> poly
-  val decale : poly -> int -> poly
-  val add : poly -> poly -> poly
-  val un : poly
-  val quotient : poly -> poly -> poly
+  type t
+  val opp : t -> t
+  val translate : int -> t -> t
+  val decale : t -> int -> t
+  val add : t -> t -> t
+  val un : t
+  val quotient : t -> t -> t
 end;;
 
 module Cyclo (Poly : Polynome) =
