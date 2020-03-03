@@ -1,26 +1,26 @@
 module type CFT =
 sig
-  type elt
+  type t
   val carac : int
   val dim : int
   val cardinal : int
-  val zero : elt
-  val elt_of_int : int -> elt
-  val int_of_elt : elt -> int
-  val list_of_elt : elt -> int list
-  val elt_of_list_int : int list -> elt
-  val random : unit -> elt
-  val print : elt -> unit
+  val zero : t
+  val of_int : int -> t 
+  val to_int : t -> int 
+  val to_list : t -> int list
+  val elt_of_list_int : int list -> t
+  val random : unit -> t
+  val print : t -> unit
   val print_table : unit -> unit
-  val un : elt
-  val alpha : elt
-  val add : elt -> elt -> elt
-  val sub : elt -> elt -> elt
-  val opp : elt -> elt
-  val mult : elt -> elt -> elt
-  val inv : elt -> elt
-  val div : elt -> elt -> elt
-  val pow : elt -> int -> elt
+  val un : t
+  val alpha : t
+  val add : t -> t -> t
+  val sub : t -> t -> t
+  val opp : t -> t
+  val mult : t -> t -> t
+  val inv : t -> t
+  val div : t -> t -> t
+  val pow : t -> int -> t
 end;;
 
 module type TT =

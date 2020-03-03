@@ -15,22 +15,22 @@ sig
   val n : int
   module Cf :
   sig
-    type elt
-    val zero : elt
+    type t
+    val zero : t
     val dim : int
-    val list_of_elt : elt -> int list
-    val elt_of_list_int : int list -> elt
+    val to_list : t -> int list
+    val elt_of_list_int : int list -> t
   end
   module Poly :
   sig
-    type elt = Cf.elt
-    type poly
-    val list_of_poly : poly -> elt list
-    val poly_of_list : elt list -> poly
+    type elt = Cf.t
+    type t
+    val list_of_poly : t -> elt list
+    val poly_of_list : elt list -> t
   end
-  val codage :  Cf.elt list -> Poly.poly
-  val decodage : Poly.poly -> Cf.elt list
-  val decodage_brut :  Poly.poly -> Cf.elt list
+  val codage :  Cf.t list -> Poly.t
+  val decodage : Poly.t -> Cf.t list
+  val decodage_brut :  Poly.t -> Cf.t list
 end
 
 module Messages (Code : CT) (Taille : TT) =
@@ -58,7 +58,7 @@ struct
     m @ (aux (i - (List.length m)))
   let int_list_of_mot i u =
     let l_elt = completer i u in
-    List.concat (List.map Cf.list_of_elt l_elt)	
+    List.concat (List.map Cf.to_list l_elt)	
 
   let elist_of_mess m = 
     let rec aux lb l i =

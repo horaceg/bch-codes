@@ -36,9 +36,9 @@ struct
       			en entiers pour bezout, puis convertit le resultat 
       			de bezout en t *)
   type t = int
-  let zero : t = 0
-  let un : t = 1
-  let alpha : t = (if Taille.carac= 2 then 1 else if Taille.carac=3 then 2 else 3)
+  let zero = 0
+  let un = 1
+  let alpha = (if Taille.carac= 2 then 1 else if Taille.carac=3 then 2 else 3)
   let carac = Taille.carac and dim = 1
   let cardinal = carac
 
@@ -59,16 +59,16 @@ struct
     | x when x >= 0 -> let y : t = x in y
     | x -> let y : t = x + carac in y
 
-  let to_int (a : t) : int = a
+  let to_int a = a
 
-  let print (u:t) = 
+  let print u = 
     print_int u;
     print_string "%";
     print_int Taille.carac
 
   let print_table () = ()
 
-  let iso op_int (a : t) (b : t) : t =
+  let iso op_int a b =
     let x, y = to_int a, to_int b in
     of_int (op_int x y)
 
@@ -76,7 +76,7 @@ struct
   and mult a b = iso ( * ) a b
   and sub a b = iso ( - ) a b
 
-  let inv (a : t) : t = 
+  let inv a = 
     let x = to_int a in
     match bezout x carac with
     | 1, u, _ -> of_int u
