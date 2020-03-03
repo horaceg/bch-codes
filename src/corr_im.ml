@@ -245,6 +245,8 @@ let rec groupe = function
   |a1::a2::a3::a4::a5::a6::a7::a8::s -> (a1+a2*2+a3*4+a4*8+a5*16+a6*32+a7*64+a8*128)::(groupe s)
   |_ -> [];;
 
+module Tqdm = Tqdm.Tqdm
+
 let coder_decoder_image image taille_y taille_x offy offx =
   let qx = taille_x / 25 in
   let qy = taille_y / 25 in
@@ -252,22 +254,13 @@ let coder_decoder_image image taille_y taille_x offy offx =
   let resultatnoncorrige = Array.make_matrix taille_y taille_x (0,0,0) in
   let resultatnoncorrigev2 = Array.make_matrix taille_y taille_x (0,0,0) in
   let source = decoupe image offx offy taille_x taille_y in
-  let compteur = ref 0.0 in
   let n_erreur = ref 0 in
   let n2_erreur = ref 0 in
 
   let process x y =
     let newimage = (decoupe image (offx+ 25*x) (offy+ 25*y) 25 25) in
     let message = list_of_image newimage in
-    print_string "chargement fini";
-    print_newline();
-    let m1,m2 = (Mess.decode_double_full (Mess.codage_full message)) in
-    print_string "d�codage fini";
-    print_newline();
-    compteur := !compteur +. 1.0;
-    print_float (!compteur*.100.0 /. (float_of_int (qx*qy)));
-    print_string " %";
-    print_newline();
+    let m1, m2 = (Mess.decode_double_full (Mess.codage_full message)) in
     let matc = image_of_list (groupe m1) 25 25 in
     let matnc = image_of_list (groupe m2) 25 25 in
     let matncv2 = image_of_list (groupe (Mess.bruite_paq message)) 25 25 in
@@ -284,17 +277,24 @@ let coder_decoder_image image taille_y taille_x offy offx =
     done;
   in
   
-  for x=0 to qx-1 do
-    for y=0 to qy-1 do
-      process x y
-    done;
-  done;
+  Tqdm.with_bar (qx*qy - 1) ~f:(fun tqdm->
+    let i = ref 0 in
+    for x=0 to qx-1 do
+      for y=0 to qy-1 do
+        process x y ;
+        Tqdm.update tqdm (!i) ;
+        incr i
+      done;
+    done;) ;
+
   write_bmp source ("./images/resultat/source.bmp");
   write_bmp resultatcorrige ("./images/resultat/corrige.bmp");
   write_bmp resultatnoncorrige ("./images/resultat/noncorrige.bmp");
   write_bmp resultatnoncorrigev2 ("./images/resultat/noncorrige_v2.bmp");
+  print_newline() ;
   print_int !n_erreur;
   print_newline();
-  print_int !n2_erreur;;
+  print_int !n2_erreur;; 
+
 let image = open_bmp_matrix "./images/perroquets.bmp";;
 coder_decoder_image image 450 350 0 0;;
