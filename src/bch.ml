@@ -5,8 +5,8 @@ sig
   val dim : int
   val cardinal : int
   val zero : t
-  val elt_of_int : int -> t
-  val int_of_elt : t -> int
+  val of_int : int -> t
+  val to_int : t -> int
   val random : unit -> t
   val print : t -> unit
   val print_table : unit -> unit

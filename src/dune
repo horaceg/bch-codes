@@ -1,0 +1,7 @@
+(executable
+    (name corr_im)
+    (libraries tqdm graphics))
+
+(env
+  (dev
+    (flags (:standard -warn-error -A))))

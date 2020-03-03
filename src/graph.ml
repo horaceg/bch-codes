@@ -1,4 +1,4 @@
-#load "graphics.cma";;
+(* #load "graphics.cma";; *)
 open Graphics;;
 let taille_x = 500;;
 let taille_y = 500;;

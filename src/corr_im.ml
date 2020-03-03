@@ -255,33 +255,38 @@ let coder_decoder_image image taille_y taille_x offy offx =
   let compteur = ref 0.0 in
   let n_erreur = ref 0 in
   let n2_erreur = ref 0 in
+
+  let process x y =
+    let newimage = (decoupe image (offx+ 25*x) (offy+ 25*y) 25 25) in
+    let message = list_of_image newimage in
+    print_string "chargement fini";
+    print_newline();
+    let m1,m2 = (Mess.decode_double_full (Mess.codage_full message)) in
+    print_string "dï¿½codage fini";
+    print_newline();
+    compteur := !compteur +. 1.0;
+    print_float (!compteur*.100.0 /. (float_of_int (qx*qy)));
+    print_string " %";
+    print_newline();
+    let matc = image_of_list (groupe m1) 25 25 in
+    let matnc = image_of_list (groupe m2) 25 25 in
+    let matncv2 = image_of_list (groupe (Mess.bruite_paq message)) 25 25 in
+    for i=0 to 24 do
+      for j=0 to 24 do
+        resultatcorrige.(i+ 25*y).(j+ 25*x) <- matc.(i).(j);
+        resultatnoncorrige.(i+ 25*y).(j+ 25*x) <- matnc.(i).(j);
+        resultatnoncorrigev2.(i+ 25*y).(j+ 25*x) <- matncv2.(i).(j);
+        if matncv2.(i).(j) <> newimage.(i).(j) then
+          incr n_erreur;
+        if matc.(i).(j) <> newimage.(i).(j) then
+          incr n2_erreur;
+      done;
+    done;
+  in
+  
   for x=0 to qx-1 do
     for y=0 to qy-1 do
-      let newimage = (decoupe image (offx+ 25*x) (offy+ 25*y) 25 25) in
-      let message = list_of_image newimage in
-      print_string "chargement fini";
-      print_newline();
-      let m1,m2 = (Mess.decode_double_full (Mess.codage_full message)) in
-      print_string "dŽcodage fini";
-      print_newline();
-      compteur := !compteur +. 1.0;
-      print_float (!compteur*.100.0 /. (float_of_int (qx*qy)));
-      print_string " %";
-      print_newline();
-      let matc = image_of_list (groupe m1) 25 25 in
-      let matnc = image_of_list (groupe m2) 25 25 in
-      let matncv2 = image_of_list (groupe (Mess.bruite_paq message)) 25 25 in
-      for i=0 to 24 do
-        for j=0 to 24 do
-          resultatcorrige.(i+ 25*y).(j+ 25*x) <- matc.(i).(j);
-          resultatnoncorrige.(i+ 25*y).(j+ 25*x) <- matnc.(i).(j);
-          resultatnoncorrigev2.(i+ 25*y).(j+ 25*x) <- matncv2.(i).(j);
-          if matncv2.(i).(j) <> newimage.(i).(j) then
-            incr n_erreur;
-          if matc.(i).(j) <> newimage.(i).(j) then
-            incr n2_erreur;
-        done;
-      done;
+      process x y
     done;
   done;
   write_bmp source ("./images/resultat/source.bmp");
