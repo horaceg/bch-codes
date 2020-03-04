@@ -13,5 +13,5 @@ Then, run :
 
 Alternatively, you can use dune:  
 `dune build src/corr_im.exe`  
-`dune exec src/corr_im.exe -- -i <input> <output>`  
+`dune exec src/corr_im.exe -- -i <input> -o <output>`  
 with `<input>` the path to your bmp image, and `output` the path to the result directory, with a trailing `/`, that must exist.
