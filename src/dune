@@ -1,6 +1,6 @@
 (executable
-    (name corr_im)
-    (libraries tqdm graphics))
+    (name main)
+    (libraries tqdm))
 
 (env
   (dev

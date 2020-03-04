@@ -1,4 +1,4 @@
-(* #load "graphics.cma";; *)
+(* #load "graphics.cma";;
 open Graphics;;
 let taille_x = 500;;
 let taille_y = 500;;
@@ -30,3 +30,4 @@ let rec graph_ln n pas=
      (x,log x)::(graph_ln (n-1) pas));;
 
 afficher 10 (graph_ln 10000 0.001) 100.0 100.0 0 0;;
+ *)

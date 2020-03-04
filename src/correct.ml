@@ -287,14 +287,22 @@ let coder_decoder_image image taille_y taille_x offy offx =
       done;
     done;) ;
 
-  write_bmp source ("./images/resultat/source.bmp");
-  write_bmp resultatcorrige ("./images/resultat/corrige.bmp");
-  write_bmp resultatnoncorrige ("./images/resultat/noncorrige.bmp");
-  write_bmp resultatnoncorrigev2 ("./images/resultat/noncorrige_v2.bmp");
-  print_newline() ;
-  print_int !n_erreur;
-  print_newline();
-  print_int !n2_erreur;; 
+  source, resultatcorrige, resultatnoncorrige, resultatnoncorrigev2, !n_erreur, !n2_erreur
 
-let image = open_bmp_matrix "./images/perroquets.bmp";;
-coder_decoder_image image 450 350 0 0;;
+let coder_decoder_image_2 image =
+  let size_y = Array.length image in
+  let size_x = Array.length image.(0) in
+  coder_decoder_image image size_y size_x 0 0 
+
+let write_outputs tuple directory =
+  let source, resultatcorrige, resultatnoncorrige, resultatnoncorrigev2, n_erreur, n2_erreur = tuple in
+  write_bmp source (directory ^ "source.bmp");
+  write_bmp resultatcorrige (directory ^ "corrige.bmp");
+  write_bmp resultatnoncorrige (directory ^ "noncorrige.bmp");
+  write_bmp resultatnoncorrigev2 (directory ^ "noncorrige_v2.bmp");
+  print_newline() ;
+  print_int n_erreur ;
+  print_newline() ;
+  print_int n2_erreur ;
+  print_newline()
+  ;;
