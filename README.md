@@ -1,5 +1,6 @@
 # bch-codes
-An implementation of BCH and Reed-solomon error-correcting codes
+An implementation of BCH and Reed-solomon error-correcting codes.  
+This was originally built in 2015 in collaboration with Théo Stoskopf.
 
 ## Running a test
 This provides a way of
