@@ -13,6 +13,8 @@ module Frob = Frobenius.Frobenius(Taille);;
 module Ext = Extensions.ExtensionOpt(Frob)(Taille);;
 module R = Reedsolomon.RS(Ext)(Taille);;
 module Mess = Bruitage.Messages(R)(Taille);;
+module Img = Img.Img
+module Tqdm = Tqdm.Tqdm
 
 let rec compter a b =
   match (a,b) with
@@ -56,19 +58,12 @@ let string_of_n n =
 
 let str_of_message l =
   let rec aux lb i = function
-    |[] -> string_of_n (n_of_l lb)
+    | [] -> string_of_n (n_of_l lb)
     | a::s -> if i=8 then
         (string_of_n (n_of_l lb)) ^ (aux [] 0 (a::s))
       else
         (aux (a::lb) (i+1) s) in
-  (aux [] 0 l);;
-
-let list_of_string str =
-  let r = ref [] in
-  let f c =
-    r := c :: (!r) in
-  String.iter f str;
-  List.rev !r;;
+  aux [] 0 l;;
 
 let bytes_of_int i =
   let rec aux e = function
@@ -108,11 +103,6 @@ let entete oc taille_x taille_y=
   output_int_little oc 2835;
   output_int_little oc 0;
   output_int_little oc 0;;
-
-let rec pow a = function
-  | 0 -> 1
-  | 1 -> a
-  | k -> a*(pow a (k-1));;
 
 let input_int_little ic =
   let res = ref Int32.zero in
@@ -192,60 +182,10 @@ let write_bmp matrix str =
   done;
   close_out oc;;
 
-let decoupe tab x y taille_x taille_y=
-  let rognage = Array.make_matrix taille_y taille_x (0,0,0) in
-  for xi=0 to taille_x-1 do
-    for yi=0 to taille_y-1 do
-      rognage.(yi).(xi) <- tab.(yi+y).(xi+x);
-    done;
-  done;
-  rognage;;
-
-let list_of_array tab =
-  let n = Array.length tab in
-  let resultat = ref []in
-  for i = (n-1) downto 0 do
-    resultat := tab.(i) :: !resultat;
-  done;
-  !resultat;;
-
-let binaire_of_int n =
-  let rec aux = function
-    | 0 -> []
-    | k -> (k mod 2) :: (aux (k/2)) 
-  in
-  let rec complet = function
-    | 0 -> []
-    | k -> 0::(complet (k-1)) in
-  let ecr = aux n in
-  ecr @ (complet (8-(List.length ecr)));;
-
-let list_of_image im = 
-  let v = Array.to_list im in
-  let l = Array.to_list (Array.concat v) in
-  List.concat (List.map (fun (x,y,z) -> (binaire_of_int x)@(binaire_of_int y)@(binaire_of_int z)) l);;
-
-let image_of_list l taille_x taille_y =
-  let tab = Array.make_matrix taille_x taille_y (0,0,0) in
-  let rec aux x y l =
-    if y = taille_y then ()
-    else
-    if x = taille_x then
-      aux 0 (y+1) l
-    else
-      match l with
-      | b::v::r::s -> tab.(y).(x) <- (b,v,r); aux (x+1) y s
-      | _ -> ()
-  in aux 0 0 l;
-  tab;;
-
-
 let rec groupe = function
   | [] -> []
   |a1::a2::a3::a4::a5::a6::a7::a8::s -> (a1+a2*2+a3*4+a4*8+a5*16+a6*32+a7*64+a8*128)::(groupe s)
   |_ -> [];;
-
-module Tqdm = Tqdm.Tqdm
 
 let coder_decoder_image image taille_y taille_x offy offx =
   let qx = taille_x / 25 in
@@ -253,17 +193,17 @@ let coder_decoder_image image taille_y taille_x offy offx =
   let resultatcorrige = Array.make_matrix taille_y taille_x (0,0,0) in
   let resultatnoncorrige = Array.make_matrix taille_y taille_x (0,0,0) in
   let resultatnoncorrigev2 = Array.make_matrix taille_y taille_x (0,0,0) in
-  let source = decoupe image offx offy taille_x taille_y in
+  let source = Img.decoupe image offx offy taille_x taille_y in
   let n_erreur = ref 0 in
   let n2_erreur = ref 0 in
 
   let process x y =
-    let newimage = (decoupe image (offx+ 25*x) (offy+ 25*y) 25 25) in
-    let message = list_of_image newimage in
-    let m1, m2 = (Mess.decode_double_full (Mess.codage_full message)) in
-    let matc = image_of_list (groupe m1) 25 25 in
-    let matnc = image_of_list (groupe m2) 25 25 in
-    let matncv2 = image_of_list (groupe (Mess.bruite_paq message)) 25 25 in
+    let newimage = Img.decoupe image (offx+ 25*x) (offy+ 25*y) 25 25 in
+    let message = Img.to_list newimage in
+    let m1, m2 = Mess.decode_double_full (Mess.codage_full message) in
+    let matc = Img.of_list (groupe m1) 25 25 in
+    let matnc = Img.of_list (groupe m2) 25 25 in
+    let matncv2 = Img.of_list (groupe (Mess.bruite_paq message)) 25 25 in
     for i=0 to 24 do
       for j=0 to 24 do
         resultatcorrige.(i+ 25*y).(j+ 25*x) <- matc.(i).(j);

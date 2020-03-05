@@ -15,7 +15,7 @@ let () =
     (fun x -> raise (Arg.Bad ("Bad argument : " ^ x)))
     usage ;
     
-    let image = Correct.open_bmp_matrix !src_path in
-    let tuple = Correct.coder_decoder_image_2 image in
-    Correct.write_outputs tuple !output_dir
+    let image = Correction.open_bmp_matrix !src_path in
+    let tuple = Correction.coder_decoder_image_2 image in
+    Correction.write_outputs tuple !output_dir
 ;;
