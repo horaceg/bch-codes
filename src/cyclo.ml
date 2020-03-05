@@ -1,6 +1,15 @@
 module type PolyType = Polynome.PolyType
 
+module type CycloType = sig
+  type poly
+
+  val decomposer : int -> int list
+  val cyclo : int -> poly
+end
+
 module Cyclo (Poly : PolyType) = struct
+  type poly = Poly.t
+
   let decomposer n =
     let rec aux k i n =
       if n > 1

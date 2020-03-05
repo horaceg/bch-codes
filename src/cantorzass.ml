@@ -1,11 +1,13 @@
 module type PolyType = Polynome.PolyType
 
-module Cantorzass (Poly : PolyType) : sig
-  type poly = Poly.t
+module type CzType = sig
+  type poly
 
   val cantor_zassenhaus : poly -> int -> poly
   val factorisation : poly -> int -> poly list
-end = struct
+end
+
+module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
   type poly = Poly.t
 
   let moins_un = Poly.opp Poly.un
