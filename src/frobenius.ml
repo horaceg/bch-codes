@@ -1,4 +1,4 @@
-module type FrobT = sig
+module type FieldT = sig
   type t
 
   val zero : t
@@ -25,7 +25,7 @@ end
 
 module Frobenius (Taille : sig
   val carac : int
-end) : FrobT = struct
+end) : FieldT = struct
   let rec bezout a b =
     match b with
     | 0 -> a, 1, 0

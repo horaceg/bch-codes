@@ -1,28 +1,4 @@
-module type CFT = sig
-  type t
-
-  val carac : int
-  val dim : int
-  val cardinal : int
-  val zero : t
-  val of_int : int -> t
-  val to_int : t -> int
-  val to_list : t -> int list
-  val elt_of_list_int : int list -> t
-  val random : unit -> t
-  val print : t -> unit
-  val print_table : unit -> unit
-  val un : t
-  val alpha : t
-  val add : t -> t -> t
-  val sub : t -> t -> t
-  val opp : t -> t
-  val mult : t -> t -> t
-  val inv : t -> t
-  val div : t -> t -> t
-  val pow : t -> int -> t
-end
-
+module type CFT = Frobenius.FieldT
 module type TT = sig
   val delta : int
 end
@@ -57,7 +33,7 @@ module RS (Corps : CFT) (Taille : TT) = struct
   let x_n = Poly.sub (Poly.decale Poly.un n) Poly.un
 
   let codage l =
-    let p = Poly.mult (Poly.poly_of_list l) gene in
+    let p = Poly.mult (Poly.of_list l) gene in
     Poly.modulo p x_n
 
   let syndrome y =
@@ -81,7 +57,7 @@ module RS (Corps : CFT) (Taille : TT) = struct
 
   let chien_algo u =
     let d = Poly.degre u in
-    let u_l = Poly.list_of_poly u in
+    let u_l = Poly.to_list u in
     let e = List.hd u_l in
     let l = ref (List.tl u_l) in
     let resultat = ref [] in
@@ -113,12 +89,12 @@ module RS (Corps : CFT) (Taille : TT) = struct
     in
     aux racine
 
-  let decodage_brut y = Poly.list_of_poly (Poly.quotient y gene)
+  let decodage_brut y = Poly.to_list (Poly.quotient y gene)
 
   let decodage y =
-    let s = Poly.poly_of_list (syndrome y) in
+    let s = Poly.of_list (syndrome y) in
     if s = Poly.nul
-    then Poly.list_of_poly (Poly.quotient y gene)
+    then Poly.to_list (Poly.quotient y gene)
     else (
       let omega, lambda = euclide (Poly.decale Poly.un (Taille.delta - 1)) s in
       let erreur = chien_algo lambda in
@@ -133,5 +109,5 @@ module RS (Corps : CFT) (Taille : TT) = struct
         | (i, c) :: s -> Poly.add (Poly.monome c i) (poly_erreur s)
       in
       let y_corr = Poly.sub y (poly_erreur l) in
-      Poly.list_of_poly (Poly.quotient y_corr gene))
+      Poly.to_list (Poly.quotient y_corr gene))
 end

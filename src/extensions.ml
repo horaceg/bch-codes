@@ -6,28 +6,7 @@ module type TT = sig
   val dim : int
 end
 
-module type CFT = sig
-  type t
-
-  val carac : int
-  val dim : int
-  val cardinal : int
-  val zero : t
-  val of_int : int -> t
-  val to_int : t -> int
-  val un : t
-  val alpha : t
-  val add : t -> t -> t
-  val sub : t -> t -> t
-  val opp : t -> t
-  val mult : t -> t -> t
-  val inv : t -> t
-  val div : t -> t -> t
-  val pow : t -> int -> t
-  val print : t -> unit
-  val print_table : unit -> unit
-  val random : unit -> t
-end
+module type CFT = Frobenius.FieldT
 
 module type ExtFuncT = functor (CorpsBase : CFT) (Taille : TT) -> sig
   type t
@@ -113,9 +92,9 @@ functor
           | [] -> acc
           | a :: s -> aux ((CorpsBase.to_int a * k) + acc) (k * CorpsBase.cardinal) s
         in
-        aux 0 1 (Poly.list_of_poly u)
+        aux 0 1 (Poly.to_list u)
 
-      let list_of_poly u = List.map CorpsBase.to_int (Poly.list_of_poly u)
+      let list_of_poly u = List.map CorpsBase.to_int (Poly.to_list u)
 
       let tables =
         let tmul = Array.make cardinal Poly.nul in
@@ -142,7 +121,7 @@ functor
           | 0 -> []
           | k -> CorpsBase.of_int (k mod c) :: aux (k / c)
         in
-        Poly.poly_of_list (aux j)
+        Poly.of_list (aux j)
 
       let completer m =
         let rec aux = function
@@ -164,7 +143,7 @@ functor
     let to_list a = Conv.completer (Conv.list_of_poly a.rep_poly)
 
     let elt_of_list_int l =
-      let p = Poly.normalise (Poly.poly_of_list (List.map CorpsBase.of_int l)) in
+      let p = Poly.normalise (Poly.of_list (List.map CorpsBase.of_int l)) in
       let c = Conv.cycl_of_poly p in
       { rep_poly = p; rep_cycl = c }
 
@@ -270,9 +249,9 @@ functor
           | [] -> acc
           | a :: s -> aux ((CorpsBase.to_int a * k) + acc) (k * CorpsBase.cardinal) s
         in
-        aux 0 1 (Poly.list_of_poly u)
+        aux 0 1 (Poly.to_list u)
 
-      let list_of_poly u = List.map CorpsBase.to_int (Poly.list_of_poly u)
+      let list_of_poly u = List.map CorpsBase.to_int (Poly.to_list u)
 
       let poly_of_int j =
         let c = CorpsBase.cardinal in
@@ -280,7 +259,7 @@ functor
           | 0 -> []
           | k -> CorpsBase.of_int (k mod c) :: aux (k / c)
         in
-        Poly.poly_of_list (aux j)
+        Poly.of_list (aux j)
 
       let completer m =
         let rec aux = function
@@ -294,7 +273,7 @@ functor
     let to_list a = Conv.completer (Conv.list_of_poly a)
 
     let elt_of_list_int l =
-      Poly.normalise (Poly.poly_of_list (List.map CorpsBase.of_int l))
+      Poly.normalise (Poly.of_list (List.map CorpsBase.of_int l))
 
     let of_int j = Conv.poly_of_int j
     let zero = Poly.nul

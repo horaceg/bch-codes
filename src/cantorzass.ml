@@ -1,26 +1,6 @@
-module type PolyCZType = sig
-  type t
+module type PolyType = Polynome.PolyType
 
-  val cardinal : int
-  val carac : int
-  val nul : t
-  val un : t
-  val normalise : t -> t
-  val print : t -> unit
-  val degre : t -> int
-  val add : t -> t -> t
-  val sub : t -> t -> t
-  val opp : t -> t
-  val quotient : t -> t -> t
-  val modulo : t -> t -> t
-  val mult : t -> t -> t
-  val powmod : t -> int -> t -> t
-  val pgcd : t -> t -> t
-  val derive : t -> t
-  val random : int -> t
-end
-
-module Cantorzass (Poly : PolyCZType) : sig
+module Cantorzass (Poly : PolyType) : sig
   type poly = Poly.t
 
   val cantor_zassenhaus : poly -> int -> poly

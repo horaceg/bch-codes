@@ -1,30 +1,13 @@
-module type CorpsType = sig
+module type CorpsType = Frobenius.FieldT
+
+module type PolyType = sig
   type t
+  type elt
 
   val carac : int
   val cardinal : int
-  val dim : int
-  val zero : t
-  val un : t
-  val random : unit -> t
-  val print : t -> unit
-  val opp : t -> t
-  val inv : t -> t
-  val add : t -> t -> t
-  val mult : t -> t -> t
-  val sub : t -> t -> t
-  val div : t -> t -> t
-  val pow : t -> int -> t
-end
-
-module type PolyFunctorType = functor (Corps : CorpsType) -> sig
-  type elt = Corps.t
-  type t
-
-  val carac : int
-  val cardinal : int
-  val poly_of_list : elt list -> t
-  val list_of_poly : t -> elt list
+  val of_list : elt list -> t
+  val to_list : t -> elt list
   val nul : t
   val un : t
   val coef_dom : t -> elt
@@ -55,11 +38,7 @@ module type PolyFunctorType = functor (Corps : CorpsType) -> sig
   val print : t -> unit
 end
 
-module Polynome : PolyFunctorType =
-functor
-  (Corps : CorpsType)
-  ->
-  struct
+ module Polynome (Corps: CorpsType): (PolyType with type elt = Corps.t) = struct
     type elt = Corps.t
 
     let carac = Corps.carac
@@ -113,8 +92,8 @@ functor
       | 0 -> [ coef ]
       | _ -> Corps.zero :: monome coef (deg - 1)
 
-    let poly_of_list a = normalise a
-    let list_of_poly a = a
+    let of_list a = normalise a
+    let to_list a = a
 
     let translate off u =
       let rec aux e i u =

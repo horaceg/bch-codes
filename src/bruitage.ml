@@ -12,21 +12,14 @@ module type CT = sig
   val k : int
   val n : int
 
-  module Cf : sig
-    type t
-
-    val zero : t
-    val dim : int
-    val to_list : t -> int list
-    val elt_of_list_int : int list -> t
-  end
+  module Cf : Frobenius.FieldT
 
   module Poly : sig
     type elt = Cf.t
     type t
 
-    val list_of_poly : t -> elt list
-    val poly_of_list : elt list -> t
+    val to_list : t -> elt list
+    val of_list : elt list -> t
   end
 
   val codage : Cf.t list -> Poly.t
@@ -127,11 +120,11 @@ module Messages (Code : CT) (Taille : TT) = struct
     List.concat (List.map (int_list_of_mot Code.k) ldecode)
 
   let decode_double_full lcodes =
-    let lmots = List.map Poly.list_of_poly lcodes in
+    let lmots = List.map Poly.to_list lcodes in
     let l_int = List.concat (List.map (int_list_of_mot Code.n) lmots) in
     let l_bruite = bruite_paq l_int in
     let l_dec = elist_of_mess l_bruite in
-    let l_mots_bruit = List.map Poly.poly_of_list (mots_of_elist Code.n l_dec) in
+    let l_mots_bruit = List.map Poly.of_list (mots_of_elist Code.n l_dec) in
     let l_decode = List.map Code.decodage l_mots_bruit in
     let l_decode_brut = List.map Code.decodage_brut l_mots_bruit in
     let ilom = int_list_of_mot Code.k in

@@ -1,25 +1,4 @@
-module type CFT = sig
-  type t
-
-  val carac : int
-  val dim : int
-  val cardinal : int
-  val zero : t
-  val of_int : int -> t
-  val to_int : t -> int
-  val random : unit -> t
-  val print : t -> unit
-  val print_table : unit -> unit
-  val un : t
-  val alpha : t
-  val add : t -> t -> t
-  val sub : t -> t -> t
-  val opp : t -> t
-  val mult : t -> t -> t
-  val inv : t -> t
-  val div : t -> t -> t
-  val pow : t -> int -> t
-end
+module type CFT = Frobenius.FieldT
 
 module type TT = sig
   val n : int
@@ -41,13 +20,13 @@ module BCH (Cf : CFT) (Taille : TT) = struct
     | [] -> []
     | a :: s -> Cf_ext.incorporer a :: lst_to_surcorps s
 
-  let gene = Poly.poly_of_list (lst_to_surcorps (CfPoly.list_of_poly poly))
+  let gene = Poly.of_list (lst_to_surcorps (CfPoly.to_list poly))
   let k = Taille.n - Poly.degre gene
   let n = Taille.n
   let x_n = Poly.sub (Poly.decale Poly.un n) Poly.un
 
   let codage l =
-    let p = Poly.mult (Poly.poly_of_list (lst_to_surcorps l)) gene in
+    let p = Poly.mult (Poly.of_list (lst_to_surcorps l)) gene in
     Poly.modulo p x_n
 
   let syndrome y =
@@ -71,7 +50,7 @@ module BCH (Cf : CFT) (Taille : TT) = struct
 
   let chien_algo u =
     let d = Poly.degre u in
-    let u_l = Poly.list_of_poly u in
+    let u_l = Poly.to_list u in
     let e = List.hd u_l in
     let l = ref (List.tl u_l) in
     let resultat = ref [] in
@@ -108,9 +87,9 @@ module BCH (Cf : CFT) (Taille : TT) = struct
     aux racine
 
   let decode_euclide y =
-    let s = Poly.poly_of_list (syndrome y) in
+    let s = Poly.of_list (syndrome y) in
     if s = Poly.nul
-    then List.map Cf_ext.extraire (Poly.list_of_poly (Poly.quotient y gene))
+    then List.map Cf_ext.extraire (Poly.to_list (Poly.quotient y gene))
     else (
       let omega, lambda = euclide (Poly.decale Poly.un (Taille.delta - 1)) s in
       let erreur = chien_algo lambda in
@@ -127,8 +106,8 @@ module BCH (Cf : CFT) (Taille : TT) = struct
         | e :: s1, (a, c) :: s2 when a > i -> e :: corriger (i + 1) (s1, corr)
         | e :: s1, (a, c) :: s2 -> Cf_ext.sub e c :: corriger (i + 1) (s1, s2)
       in
-      let y_corr = Poly.poly_of_list (corriger 0 (Poly.list_of_poly y, l)) in
+      let y_corr = Poly.of_list (corriger 0 (Poly.to_list y, l)) in
       let y_inv = Poly.quotient y_corr gene in
-      try List.map Cf_ext.extraire (Poly.list_of_poly y_inv) with
+      try List.map Cf_ext.extraire (Poly.to_list y_inv) with
       | _ -> [])
 end

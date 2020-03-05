@@ -1,25 +1,4 @@
-module type CFT = sig
-  type t
-
-  val carac : int
-  val dim : int
-  val cardinal : int
-  val zero : t
-  val of_int : int -> t
-  val to_int : t -> int
-  val random : unit -> t
-  val print : t -> unit
-  val print_table : unit -> unit
-  val un : t
-  val alpha : t
-  val add : t -> t -> t
-  val sub : t -> t -> t
-  val opp : t -> t
-  val mult : t -> t -> t
-  val inv : t -> t
-  val div : t -> t -> t
-  val pow : t -> int -> t
-end
+module type CFT = Frobenius.FieldT
 
 module type TT = sig
   val n : int
@@ -169,7 +148,7 @@ module Decomposition (Fq : CFT) (Taille : TT) = struct
         Poly.mult p (developpe s)
     in
     let p_fqm = developpe cl in
-    PolyFq.poly_of_list (List.map F_qm.extraire (Poly.list_of_poly p_fqm))
+    PolyFq.of_list (List.map F_qm.extraire (Poly.to_list p_fqm))
 
   let exposants l =
     let rec aux i iprec prec temp temp_prec = function
