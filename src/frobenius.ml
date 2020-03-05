@@ -1,6 +1,6 @@
-module type FrobT =
-sig
+module type FrobT = sig
   type t
+
   val zero : t
   val un : t
   val alpha : t
@@ -23,45 +23,55 @@ sig
   val random : unit -> t
 end
 
-module Frobenius( Taille : sig val carac : int end ) : FrobT =
-struct
-  let rec bezout a b = match b with
-    | 0 -> (a, 1, 0)
-    | _ -> 
+module Frobenius (Taille : sig
+  val carac : int
+end) : FrobT = struct
+  let rec bezout a b =
+    match b with
+    | 0 -> a, 1, 0
+    | _ ->
       let d, u, v = bezout b (a mod b) in
-      (d, v, u - (a / b) * v)
+      d, v, u - (a / b * v)
 
   (** la fonction bezout manipule bien des entiers,
       			mais la fonction "inverse" prend des t, les convertit
       			en entiers pour bezout, puis convertit le resultat 
       			de bezout en t *)
   type t = int
+
   let zero = 0
   let un = 1
-  let alpha = (if Taille.carac= 2 then 1 else if Taille.carac=3 then 2 else 3)
-  let carac = Taille.carac and dim = 1
+  let alpha = if Taille.carac = 2 then 1 else if Taille.carac = 3 then 2 else 3
+
+  let carac = Taille.carac
+  and dim = 1
+
   let cardinal = carac
 
   let elt_of_list_int l =
     match l with
     | [] -> 0
-    | [a] -> a
+    | [ a ] -> a
     | _ -> failwith "element of list int : Frob"
 
-  let to_list a =
-    [a]
+  let to_list a = [ a ]
 
   let ( % ) a b =
     let x : t = a mod b in
-    if x >= zero then x else b + x 
+    if x >= zero then x else b + x
 
-  let of_int i = match i mod carac with
-    | x when x >= 0 -> let y : t = x in y
-    | x -> let y : t = x + carac in y
+  let of_int i =
+    match i mod carac with
+    | x when x >= 0 ->
+      let y : t = x in
+      y
+    | x ->
+      let y : t = x + carac in
+      y
 
   let to_int a = a
 
-  let print u = 
+  let print u =
     print_int u;
     print_string "%";
     print_int Taille.carac
@@ -76,7 +86,7 @@ struct
   and mult a b = iso ( * ) a b
   and sub a b = iso ( - ) a b
 
-  let inv a = 
+  let inv a =
     let x = to_int a in
     match bezout x carac with
     | 1, u, _ -> of_int u
@@ -84,12 +94,14 @@ struct
 
   let opp x = sub zero x
   let div a b = mult a (inv b)
-  let pow a n = 
+
+  let pow a n =
     let rec aux a = function
       | 0 -> un
       | k when k land 1 = 0 -> aux (mult a a) (k / 2)
       | k -> mult a (aux (mult a a) (k / 2))
-    in aux a n
+    in
+    aux a n
 
-  let random () = of_int (Random.int (carac))
-end ;;
+  let random () = of_int (Random.int carac)
+end
