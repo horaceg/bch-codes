@@ -50,28 +50,6 @@ module Decomposition (Fq : CFT) (Taille : TT) = struct
   let n_red, r, m, s, classes_cyclo = calcule_classes p q n
 
   module Generateur = struct
-    let rec division = function
-      | [] -> [], []
-      | [ a ] -> [ a ], []
-      | a :: b :: s ->
-        let l1, l2 = division s in
-        a :: l1, b :: l2
-
-    let rec fusion compare (l1, l2) =
-      match l1, l2 with
-      | [], [] -> []
-      | [], b -> b
-      | b, [] -> b
-      | a :: s1, b :: s2 ->
-        if compare a b then a :: fusion compare (s1, l2) else b :: fusion compare (l1, s2)
-
-    let rec tri_fusion compare = function
-      | [] -> []
-      | [ a ] -> [ a ]
-      | l ->
-        let l1, l2 = division l in
-        fusion compare (tri_fusion compare l1, tri_fusion compare l2)
-
     let n_consecutifs l =
       let rec aux i iprec prec = function
         | [] -> max i iprec
@@ -100,13 +78,14 @@ module Decomposition (Fq : CFT) (Taille : TT) = struct
         | (i, s) :: ls when i <> i_prec -> (i, s) :: aux i ls
         | _ :: ls -> aux i_prec ls
       in
-      let compare (a, _) (c, _) = a < c in
-      aux
-        (-1)
-        (tri_fusion
-           compare
-           (calcul_consecutifs (List.map (tri_fusion ( < )) (combinaison classes_cyclo))))
-
+      let compare (a, _) (c, _) = Int.compare a c in
+      classes_cyclo
+      |> combinaison
+      |> List.map (List.sort Int.compare)
+      |> calcul_consecutifs
+      |> List.sort compare
+      |> aux (-1)
+      
     let meilleur_ratio cl_delta n =
       let norm a b = if a > b then b - 1 else a in
       let rapport (a, b) =
