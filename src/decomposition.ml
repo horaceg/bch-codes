@@ -100,7 +100,7 @@ module Decomposition (Fq : CFT) (Taille : TT) = struct
         | (i, s) :: ls when i <> i_prec -> (i, s) :: aux i ls
         | _ :: ls -> aux i_prec ls
       in
-      let compare (a, b) (c, d) = a < c in
+      let compare (a, _) (c, _) = a < c in
       aux
         (-1)
         (tri_fusion
@@ -122,8 +122,8 @@ module Decomposition (Fq : CFT) (Taille : TT) = struct
       in
       match cl_delta with
       | [] -> 0.0
-      | [ a ] -> 0.0
-      | a :: b :: s -> aux b s
+      | [ _ ] -> 0.0
+      | _ :: b :: s -> aux b s
   end
 
   let classes_delta = Generateur.classe_delta classes_cyclo
@@ -164,8 +164,8 @@ module Decomposition (Fq : CFT) (Taille : TT) = struct
   let fact_of_delta delta =
     let rec aux k = function
       | [] -> failwith "delta introuvable" (*impossible*)
-      | (i, l) :: s when i = k -> l
-      | (i, l) :: s -> aux k s
+      | (i, l) :: _ when i = k -> l
+      | (_, _) :: s -> aux k s
     in
     let l = aux (delta - 1) classes_delta in
     exposants l, polmin l

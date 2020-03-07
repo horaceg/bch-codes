@@ -103,8 +103,8 @@ module BCH (Cf : CFT) (Taille : TT) = struct
         match m, corr with
         | a, [] -> a
         | [], _ -> []
-        | e :: s1, (a, c) :: s2 when a > i -> e :: corriger (i + 1) (s1, corr)
-        | e :: s1, (a, c) :: s2 -> Cf_ext.sub e c :: corriger (i + 1) (s1, s2)
+        | e :: s1, (a, _) :: _ when a > i -> e :: corriger (i + 1) (s1, corr)
+        | e :: s1, (_, c) :: s2 -> Cf_ext.sub e c :: corriger (i + 1) (s1, s2)
       in
       let y_corr = Poly.of_list (corriger 0 (Poly.to_list y, l)) in
       let y_inv = Poly.quotient y_corr gene in

@@ -179,9 +179,9 @@ struct
     let cycl_of_poly u = table_add.(int_of_poly u)
 
     let poly_of_cycl c =
-      table_mult.((match c with
+      table_mult.(match c with
                   | IntExt.Inf -> cardinal - 1
-                  | IntExt.Fini x -> x))
+                  | IntExt.Fini x -> x)
   end
 
   type t =

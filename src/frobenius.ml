@@ -33,10 +33,6 @@ end) : FieldT = struct
       let d, u, v = bezout b (a mod b) in
       d, v, u - (a / b * v)
 
-  (** la fonction bezout manipule bien des entiers,
-      			mais la fonction "inverse" prend des t, les convertit
-      			en entiers pour bezout, puis convertit le resultat 
-      			de bezout en t *)
   type t = int
 
   let zero = 0

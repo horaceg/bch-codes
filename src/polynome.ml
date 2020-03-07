@@ -44,9 +44,6 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
   let carac = Corps.carac
   let cardinal = Corps.cardinal
   let inv = Corps.inv
-  let ( +% ) = Corps.add
-  let ( *% ) = Corps.mult
-  let ( -% ) = Corps.sub
   let ( /% ) = Corps.div
 
   type t = elt list
@@ -110,20 +107,20 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     let v = normalise u in
     let rec aux acc = function
       | [] -> acc
-      | a :: s -> aux (succ acc) s
+      | _ :: s -> aux (succ acc) s
     in
     aux (-1) (normalise v)
 
   let rec evaluer u x =
     match u with
     | [] -> Corps.zero
-    | a :: q -> (evaluer q x *% x) +% a
+    | a :: q -> evaluer q x |> Corps.mult x |> Corps.add a
 
   let rec add1 u v =
     match u, v with
     | [], _ -> v
     | _, [] -> u
-    | a :: u', b :: v' -> (a +% b) :: add1 u' v'
+    | a :: u', b :: v' -> Corps.add a b :: add1 u' v'
 
   let add u v = normalise (add1 u v)
 
@@ -131,10 +128,10 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     match u, v with
     | _, [] -> u
     | [], x :: v' -> Corps.opp x :: sub1 [] v'
-    | a :: u', b :: v' -> (a -% b) :: sub1 u' v'
+    | a :: u', b :: v' -> (Corps.sub a b) :: sub1 u' v'
 
   let rec sub u v = normalise (sub1 u v)
-  let mult_par_scal u s = if s = Corps.zero then [] else List.map (fun x -> x *% s) u
+  let mult_par_scal u s = if s = Corps.zero then [] else List.map (fun x -> Corps.mult x s) u
   let opp u = mult_par_scal u (Corps.opp Corps.un)
 
   let rec mult u v =
@@ -144,7 +141,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     | [ a ], _ -> mult_par_scal v a
     | _, [ b ] -> mult_par_scal u b
     | a :: u1, b :: v1 ->
-      (a *% b)
+      Corps.mult a b
       :: add (add (mult_par_scal v1 a) (mult_par_scal u1 b)) (Corps.zero :: mult u1 v1)
 
   let coef_dom u =
@@ -164,8 +161,8 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
       then q, r
       else (
         let dom_r = coef_dom r in
-        let mq = mult_par_scal (decale v (deg_r - deg_v)) (dom_r *% inv_dom_v) in
-        aux (add q (monome (dom_r *% inv_dom_v) (deg_r - deg_v))) (sub r mq))
+        let mq = mult_par_scal (decale v (deg_r - deg_v)) (Corps.mult dom_r inv_dom_v) in
+        aux (add q (monome (Corps.mult dom_r inv_dom_v) (deg_r - deg_v))) (sub r mq))
     in
     aux [] u
 
@@ -173,10 +170,10 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     match u, v with
     | _, [] -> failwith "division euclidienne par le polynome nul"
     | [], _ -> Corps.zero, []
-    | [ a ], [ b ] -> a /% b, []
+    | [ a ], [ b ] -> Corps.div a b, []
     | a :: u1, b :: v1 ->
       let c, r1 = div_elem u1 v1 in
-      c, (a -% (b *% c)) :: r1
+      c, (Corps.sub a (Corps.mult b c)) :: r1
 
   let quotient u v = fst (division u v)
   let modulo u v = snd (division u v)
@@ -225,14 +222,14 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     in
     match u with
     | [] -> []
-    | e :: s -> normalise (aux 1 s)
+    | _ :: s -> normalise (aux 1 s)
 
   let reciproque u = List.rev u
 
   let coef_constant u =
     match u with
     | [] -> Corps.zero
-    | a :: s -> a
+    | a :: _ -> a
 
   (** renvoie un polynome de degr� < n *)
   let random n =

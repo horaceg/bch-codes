@@ -124,7 +124,7 @@ let read_entete ic =
 
 let open_bmp_matrix str =
   let ic = open_in_bin str in
-  let offset, taille_x, taille_y, pad = read_entete ic in
+  let _, taille_x, taille_y, pad = read_entete ic in
   let resultat = Array.make_matrix taille_x taille_y (0, 0, 0) in
   for y = taille_y - 1 downto 0 do
     for x = 0 to taille_x - 1 do
