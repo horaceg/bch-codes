@@ -89,7 +89,7 @@ module Messages (Code : CT) (Taille : TT) = struct
     match k, l with
     | _, [] -> lb, []
     | 0, _ -> lb, l
-    | _, a :: s -> brouille (Random.int carac :: lb) (k - 1) s
+    | _, _ :: s -> brouille (Random.int carac :: lb) (k - 1) s
 
   let rec bruite_paq = function
     | [] -> []
@@ -113,18 +113,23 @@ module Messages (Code : CT) (Taille : TT) = struct
     match l1, l2 with
     | [], _ | _, [] -> 0
     | a :: s, b :: t when a <> b -> 1 + compte_erreurs s t
-    | a :: s, b :: t -> compte_erreurs s t
+    | _ :: s, _ :: t -> compte_erreurs s t
 
   let decode_full lcodes =
     let ldecode = List.map Code.decodage lcodes in
     List.concat (List.map (int_list_of_mot Code.k) ldecode)
 
   let decode_double_full lcodes =
-    let lmots = List.map Poly.to_list lcodes in
-    let l_int = List.concat (List.map (int_list_of_mot Code.n) lmots) in
-    let l_bruite = bruite_paq l_int in
-    let l_dec = elist_of_mess l_bruite in
-    let l_mots_bruit = List.map Poly.of_list (mots_of_elist Code.n l_dec) in
+    let l_mots_bruit =
+      lcodes
+      |> List.map Poly.to_list
+      |> List.map (int_list_of_mot Code.n)
+      |> List.concat
+      |> bruite_paq
+      |> elist_of_mess
+      |> mots_of_elist Code.n
+      |> List.map Poly.of_list
+    in
     let l_decode = List.map Code.decodage l_mots_bruit in
     let l_decode_brut = List.map Code.decodage_brut l_mots_bruit in
     let ilom = int_list_of_mot Code.k in
