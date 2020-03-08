@@ -23,10 +23,10 @@ module BCH (Cf : CFT) (Taille : TT) = struct
   let gene = Poly.of_list (lst_to_surcorps (CfPoly.to_list poly))
   let k = Taille.n - Poly.degre gene
   let n = Taille.n
-  let x_n = Poly.sub (Poly.decale Poly.un n) Poly.un
+  let x_n = Poly.sub (Poly.decale Poly.one n) Poly.one
 
   let codage l =
-    let p = Poly.mult (Poly.of_list (lst_to_surcorps l)) gene in
+    let p = Poly.mul (Poly.of_list (lst_to_surcorps l)) gene in
     Poly.modulo p x_n
 
   let syndrome y =
@@ -42,11 +42,11 @@ module BCH (Cf : CFT) (Taille : TT) = struct
       then r, v
       else (
         let q, r_suiv = Poly.division r_prec r in
-        let v_suiv = Poly.sub v_prec (Poly.mult q v) in
-        let u_suiv = Poly.sub u_prec (Poly.mult q u) in
+        let v_suiv = Poly.sub v_prec (Poly.mul q v) in
+        let u_suiv = Poly.sub u_prec (Poly.mul q u) in
         aux u u_suiv v v_suiv r r_suiv)
     in
-    aux Poly.un Poly.nul Poly.nul Poly.un a b
+    aux Poly.one Poly.nul Poly.nul Poly.one a b
 
   let chien_algo u =
     let d = Poly.degre u in
@@ -66,7 +66,7 @@ module BCH (Cf : CFT) (Taille : TT) = struct
     for i = 0 to Taille.n - 1 do
       let z = Cf_ext.add e (somme !l) in
       if z = Cf_ext.zero then resultat := i :: !resultat;
-      l := List.map2 Cf_ext.mult l_beta_prime !l
+      l := List.map2 Cf_ext.mul l_beta_prime !l
     done;
     !resultat
 
@@ -81,7 +81,7 @@ module BCH (Cf : CFT) (Taille : TT) = struct
         let l = Poly.evaluer lambda_d x_j_inv in
         ( (n - a) mod n
         , Cf_ext.opp
-            (Cf_ext.mult (Cf_ext.div o l) (Cf_ext.mult (Cf_ext.pow x_j_inv b) x_j)) )
+            (Cf_ext.mul (Cf_ext.div o l) (Cf_ext.mul (Cf_ext.pow x_j_inv b) x_j)) )
         :: aux s
     in
     aux racine
@@ -91,7 +91,7 @@ module BCH (Cf : CFT) (Taille : TT) = struct
     if s = Poly.nul
     then List.map Cf_ext.extraire (Poly.to_list (Poly.quotient y gene))
     else (
-      let omega, lambda = euclide (Poly.decale Poly.un (Taille.delta - 1)) s in
+      let omega, lambda = euclide (Poly.decale Poly.one (Taille.delta - 1)) s in
       let erreur = chien_algo lambda in
       let l =
         List.sort

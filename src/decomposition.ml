@@ -119,12 +119,12 @@ module Decomposition (Fq : CFT) (Taille : TT) = struct
   let beta = F_qm.pow F_qm.alpha s
 
   let polmin cl =
-    let x = Poly.monome F_qm.un 1 in
+    let x = Poly.monome F_qm.one 1 in
     let rec developpe = function
-      | [] -> Poly.un
+      | [] -> Poly.one
       | i :: s ->
         let p = Poly.sub x (Poly.monome (F_qm.pow beta i) 0) in
-        Poly.mult p (developpe s)
+        Poly.mul p (developpe s)
     in
     let p_fqm = developpe cl in
     PolyFq.of_list (List.map F_qm.extraire (Poly.to_list p_fqm))

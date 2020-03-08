@@ -10,7 +10,7 @@ end
 module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
   type poly = Poly.t
 
-  let moins_un = Poly.opp Poly.un
+  let moins_un = Poly.opp Poly.one
   let carac = Poly.carac
   let cardinal = Poly.cardinal
 
@@ -20,7 +20,7 @@ module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
 
   let ( +: ) a b = Poly.add a b
   let ( -: ) a b = Poly.sub a b
-  let ( *: ) a b = Poly.mult a b
+  let ( *: ) a b = Poly.mul a b
   let ( /: ) a b = Poly.quotient a b
   let ( %: ) a b = Poly.modulo a b
 
@@ -35,10 +35,10 @@ module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
       else (
         let b = Poly.powmod r ((cardinal - 1) / 2) u in
         let bmod = b %: u in
-        if bmod = Poly.un
+        if bmod = Poly.one
         then cantor_p_impair u d
         else (
-          let v = Poly.pgcd (b -: Poly.un) u in
+          let v = Poly.pgcd (b -: Poly.one) u in
           if Poly.degre v >= d then cantor_p_impair v d else cantor_p_impair u d)))
 
   let rec cantor_p_pair u d =
@@ -58,7 +58,7 @@ module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
             smod +: somme (k + 1) (smod *: smod %: u))
         in
         let bmod = somme 0 r %: u in
-        if bmod = Poly.un || bmod = Poly.nul
+        if bmod = Poly.one || bmod = Poly.nul
         then cantor_p_pair u d
         else (
           let v = Poly.pgcd bmod u in

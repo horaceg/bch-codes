@@ -36,12 +36,12 @@ module type ExtT = sig
   val elt_of_list_int : int list -> t
   val extraire : t -> elt
   val incorporer : elt -> t
-  val un : t
+  val one : t
   val alpha : t
   val add : t -> t -> t
   val sub : t -> t -> t
   val opp : t -> t
-  val mult : t -> t -> t
+  val mul : t -> t -> t
   val inv : t -> t
   val div : t -> t -> t
   val pow : t -> int -> t
@@ -101,21 +101,21 @@ module ExtensionNonOpt (CorpsBase : CFT) (Taille : TT) :
   let elt_of_list_int l = Poly.normalise (Poly.of_list (List.map CorpsBase.of_int l))
   let of_int j = Conv.poly_of_int j
   let zero = Poly.nul
-  let un = Poly.un
-  let alpha = Poly.decale un 1
+  let one = Poly.one
+  let alpha = Poly.decale one 1
   let add a b = Poly.add a b
   let sub a b = Poly.sub a b
   let opp a = sub zero a
   let print_table () = ()
-  let mult a b = Poly.modulo (Poly.mult a b) poly_irr
+  let mul a b = Poly.modulo (Poly.mul a b) poly_irr
 
   let inv a =
     let d, u, _ = Poly.euclide a poly_irr in
-    if d <> Poly.un then failwith "poly non inversible" else Poly.modulo u poly_irr
+    if d <> Poly.one then failwith "poly non inversible" else Poly.modulo u poly_irr
 
   let div a b =
     let bm = inv b in
-    mult a bm
+    mul a bm
 
   let print a = Poly.print a
   let random () = Poly.random dim
@@ -154,7 +154,7 @@ struct
       | Inf -> failwith "division par zero"
       | Fini x -> Fini (modpos (-x) cm1)
 
-    let mult a b =
+    let mul a b =
       match a, b with
       | Inf, _ -> Inf
       | _, Inf -> Inf
@@ -168,18 +168,18 @@ struct
       let tmul = Array.make cardinal Poly.nul in
       let tadd = Array.make cardinal IntExt.Inf in
       for i = 0 to cardinal - 2 do
-        let rp = Poly.modulo (Poly.monome CorpsBase.un i) poly_irr in
+        let rp = Poly.modulo (Poly.monome CorpsBase.one i) poly_irr in
         tmul.(i) <- rp;
         tadd.(int_of_poly rp) <- IntExt.Fini i
       done;
       tadd, tmul
 
     let table_add = fst tables
-    let table_mult = snd tables
+    let table_mul = snd tables
     let cycl_of_poly u = table_add.(int_of_poly u)
 
     let poly_of_cycl c =
-      table_mult.(match c with
+      table_mul.(match c with
                   | IntExt.Inf -> cardinal - 1
                   | IntExt.Fini x -> x)
   end
@@ -218,7 +218,7 @@ struct
     done
 
   let zero = { rep_cycl = IntExt.Inf; rep_poly = Poly.nul }
-  let un = { rep_cycl = IntExt.Fini 0; rep_poly = Poly.un }
+  let one = { rep_cycl = IntExt.Fini 0; rep_poly = Poly.one }
   let alpha = { rep_cycl = IntExt.Fini 1; rep_poly = Conv.poly_of_cycl (IntExt.Fini 1) }
 
   let add a b =
@@ -233,7 +233,7 @@ struct
 
   let opp a = sub zero a
 
-  let mult a b =
+  let mul a b =
     let c = IntExt.add a.rep_cycl b.rep_cycl in
     let p = Conv.poly_of_cycl c in
     { rep_cycl = c; rep_poly = p }
@@ -245,7 +245,7 @@ struct
 
   let div a b =
     let bm = inv b in
-    mult a bm
+    mul a bm
 
   let print a =
     match a.rep_cycl with
@@ -260,7 +260,7 @@ struct
     { rep_cycl = c; rep_poly = Conv.poly_of_cycl c }
 
   let pow a n =
-    let c = IntExt.mult a.rep_cycl (IntExt.Fini n) in
+    let c = IntExt.mul a.rep_cycl (IntExt.Fini n) in
     let p = Conv.poly_of_cycl c in
     { rep_cycl = c; rep_poly = p }
 

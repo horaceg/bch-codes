@@ -22,19 +22,19 @@ module RS (Corps : CFT) (Taille : TT) = struct
   let beta_list = List.map (Cf.pow beta) facteur_consecutifs
 
   let gene =
-    let x = Poly.decale Poly.un 1 in
+    let x = Poly.decale Poly.one 1 in
     let rec aux = function
-      | 0 -> Poly.un
-      | k -> Poly.mult (Poly.sub x (Poly.monome (Cf.pow beta k) 0)) (aux (k - 1))
+      | 0 -> Poly.one
+      | k -> Poly.mul (Poly.sub x (Poly.monome (Cf.pow beta k) 0)) (aux (k - 1))
     in
     aux (Taille.delta - 1)
 
   let n = Cf.cardinal - 1
   let k = n - Poly.degre gene
-  let x_n = Poly.sub (Poly.decale Poly.un n) Poly.un
+  let x_n = Poly.sub (Poly.decale Poly.one n) Poly.one
 
   let codage l =
-    let p = Poly.mult (Poly.of_list l) gene in
+    let p = Poly.mul (Poly.of_list l) gene in
     Poly.modulo p x_n
 
   let syndrome y =
@@ -50,11 +50,11 @@ module RS (Corps : CFT) (Taille : TT) = struct
       then r, v
       else (
         let q, r_suiv = Poly.division r_prec r in
-        let v_suiv = Poly.sub v_prec (Poly.mult q v) in
-        let u_suiv = Poly.sub u_prec (Poly.mult q u) in
+        let v_suiv = Poly.sub v_prec (Poly.mul q v) in
+        let u_suiv = Poly.sub u_prec (Poly.mul q u) in
         aux u u_suiv v v_suiv r r_suiv)
     in
-    aux Poly.un Poly.nul Poly.nul Poly.un a b
+    aux Poly.one Poly.nul Poly.nul Poly.one a b
 
   let chien_algo u =
     let d = Poly.degre u in
@@ -74,7 +74,7 @@ module RS (Corps : CFT) (Taille : TT) = struct
     for i = 0 to n - 1 do
       let z = Cf.add e (somme !l) in
       if z = Cf.zero then resultat := i :: !resultat;
-      l := List.map2 Cf.mult l_beta_prime !l
+      l := List.map2 Cf.mul l_beta_prime !l
     done;
     !resultat
 
@@ -97,7 +97,7 @@ module RS (Corps : CFT) (Taille : TT) = struct
     if s = Poly.nul
     then Poly.to_list (Poly.quotient y gene)
     else (
-      let omega, lambda = euclide (Poly.decale Poly.un (Taille.delta - 1)) s in
+      let omega, lambda = euclide (Poly.decale Poly.one (Taille.delta - 1)) s in
       let erreur = chien_algo lambda in
       let l =
         try forney_algo erreur omega lambda with

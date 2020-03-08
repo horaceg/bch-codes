@@ -36,5 +36,5 @@ module Cyclo (Poly : PolyType) = struct
     in
     Poly.translate
       ((n / m) - 1)
-      (aux (Poly.add (Poly.opp Poly.un) (Poly.decale Poly.un 1)) prem)
+      (aux (Poly.add (Poly.opp Poly.one) (Poly.decale Poly.one 1)) prem)
 end

@@ -9,7 +9,7 @@ module type PolyType = sig
   val of_list : elt list -> t
   val to_list : t -> elt list
   val nul : t
-  val un : t
+  val one : t
   val coef_dom : t -> elt
   val map : (elt -> elt) -> t -> t
   val evaluer : t -> elt -> elt
@@ -24,13 +24,13 @@ module type PolyType = sig
   val opp : t -> t
   val add : t -> t -> t
   val sub : t -> t -> t
-  val mult : t -> t -> t
+  val mul : t -> t -> t
   val pow : t -> int -> t
   val powmod : t -> int -> t -> t
   val division : t -> t -> t * t
   val quotient : t -> t -> t
   val modulo : t -> t -> t
-  val mult_par_scal : t -> elt -> t
+  val mul_par_scal : t -> elt -> t
   val translate : int -> t -> t
   val pgcd : t -> t -> t
   val euclide : t -> t -> t * t * t
@@ -48,11 +48,11 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
 
   type t = elt list
 
-  let un = [ Corps.un ]
+  let one = [ Corps.one ]
   let nul = []
   let map f p = List.map f p
 
-  (** Attention : cette fonction ne rend pas un polynome unitaire,
+  (** Attention : cette fonction ne rend pas one polynome unitaire,
         		mais enleve les zeros superflus *)
   let normalise u =
     let rec aux = function
@@ -114,7 +114,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
   let rec evaluer u x =
     match u with
     | [] -> Corps.zero
-    | a :: q -> evaluer q x |> Corps.mult x |> Corps.add a
+    | a :: q -> evaluer q x |> Corps.mul x |> Corps.add a
 
   let rec add1 u v =
     match u, v with
@@ -131,18 +131,18 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     | a :: u', b :: v' -> (Corps.sub a b) :: sub1 u' v'
 
   let rec sub u v = normalise (sub1 u v)
-  let mult_par_scal u s = if s = Corps.zero then [] else List.map (fun x -> Corps.mult x s) u
-  let opp u = mult_par_scal u (Corps.opp Corps.un)
+  let mul_par_scal u s = if s = Corps.zero then [] else List.map (fun x -> Corps.mul x s) u
+  let opp u = mul_par_scal u (Corps.opp Corps.one)
 
-  let rec mult u v =
+  let rec mul u v =
     match u, v with
     | [], _ -> []
     | _, [] -> []
-    | [ a ], _ -> mult_par_scal v a
-    | _, [ b ] -> mult_par_scal u b
+    | [ a ], _ -> mul_par_scal v a
+    | _, [ b ] -> mul_par_scal u b
     | a :: u1, b :: v1 ->
-      Corps.mult a b
-      :: add (add (mult_par_scal v1 a) (mult_par_scal u1 b)) (Corps.zero :: mult u1 v1)
+      Corps.mul a b
+      :: add (add (mul_par_scal v1 a) (mul_par_scal u1 b)) (Corps.zero :: mul u1 v1)
 
   let coef_dom u =
     let rec cherche = function
@@ -161,8 +161,8 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
       then q, r
       else (
         let dom_r = coef_dom r in
-        let mq = mult_par_scal (decale v (deg_r - deg_v)) (Corps.mult dom_r inv_dom_v) in
-        aux (add q (monome (Corps.mult dom_r inv_dom_v) (deg_r - deg_v))) (sub r mq))
+        let mq = mul_par_scal (decale v (deg_r - deg_v)) (Corps.mul dom_r inv_dom_v) in
+        aux (add q (monome (Corps.mul dom_r inv_dom_v) (deg_r - deg_v))) (sub r mq))
     in
     aux [] u
 
@@ -173,11 +173,11 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     | [ a ], [ b ] -> Corps.div a b, []
     | a :: u1, b :: v1 ->
       let c, r1 = div_elem u1 v1 in
-      c, (Corps.sub a (Corps.mult b c)) :: r1
+      c, (Corps.sub a (Corps.mul b c)) :: r1
 
   let quotient u v = fst (division u v)
   let modulo u v = snd (division u v)
-  let unitaire u = mult_par_scal u (inv (coef_dom u))
+  let unitaire u = mul_par_scal u (inv (coef_dom u))
 
   let rec pgcd a b =
     let rec aux a = function
@@ -189,26 +189,26 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
   let euclide a b =
     let rec aux a b =
       match b with
-      | [] -> a, un, []
+      | [] -> a, one, []
       | _ ->
         let q, r = division a b in
         let d, u, v = aux b r in
-        d, v, sub u (mult q v)
+        d, v, sub u (mul q v)
     in
     let d, u, v = aux a b in
     let c = inv (coef_dom d) in
-    mult_par_scal d c, mult_par_scal u c, mult_par_scal v c
+    mul_par_scal d c, mul_par_scal u c, mul_par_scal v c
 
   let rec pow u = function
-    | 0 -> un
-    | n when n land 1 = 0 -> pow (mult u u) (n / 2)
-    | n -> mult u (pow (mult u u) (n / 2))
+    | 0 -> one
+    | n when n land 1 = 0 -> pow (mul u u) (n / 2)
+    | n -> mul u (pow (mul u u) (n / 2))
 
   let rec powmod u n v =
     match n with
-    | 0 -> un
-    | n when n land 1 = 0 -> powmod (modulo (mult u u) v) (n / 2) v
-    | n -> modulo (mult u (powmod (modulo (mult u u) v) (n / 2) v)) v
+    | 0 -> one
+    | n when n land 1 = 0 -> powmod (modulo (mul u u) v) (n / 2) v
+    | n -> modulo (mul u (powmod (modulo (mul u u) v) (n / 2) v)) v
 
   let rec somme k a =
     match k with
@@ -231,7 +231,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     | [] -> Corps.zero
     | a :: _ -> a
 
-  (** renvoie un polynome de degr� < n *)
+  (** renvoie one polynome de degr� < n *)
   let random n =
     let rec aux = function
       | -1 -> []

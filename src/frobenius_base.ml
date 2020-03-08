@@ -2,7 +2,7 @@ module type BaseFieldT = sig
   type t
 
   val zero : t
-  val un : t
+  val one : t
   val carac : int
   val dim : int
   val cardinal : int
@@ -15,7 +15,7 @@ module type BaseFieldT = sig
   val add : t -> t -> t
   val sub : t -> t -> t
   val opp : t -> t
-  val mult : t -> t -> t
+  val mul : t -> t -> t
   val inv : t -> t
   val div : t -> t -> t
   val pow : t -> int -> t
@@ -37,7 +37,7 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
   type t = int
 
   let zero = 0
-  let un = 1
+  let one = 1
   
   let carac = Taille.carac
   let dim = 1
@@ -74,7 +74,7 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
     of_int (op_int a b)
 
   let add a b = iso ( + ) a b
-  and mult a b = iso ( * ) a b
+  and mul a b = iso ( * ) a b
   and sub a b = iso ( - ) a b
 
   let inv a =
@@ -83,13 +83,13 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
     | _ -> failwith "elt non inversible"
 
   let opp x = sub zero x
-  let div a b = mult a (inv b)
+  let div a b = mul a (inv b)
 
   let pow a n =
     let rec aux a = function
-      | 0 -> un
-      | k when k land 1 = 0 -> aux (mult a a) (k / 2)
-      | k -> mult a (aux (mult a a) (k / 2))
+      | 0 -> one
+      | k when k land 1 = 0 -> aux (mul a a) (k / 2)
+      | k -> mul a (aux (mul a a) (k / 2))
     in
     aux a n
 
