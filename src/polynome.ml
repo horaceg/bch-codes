@@ -8,7 +8,7 @@ module type PolyType = sig
   val cardinal : int
   val of_list : elt list -> t
   val to_list : t -> elt list
-  val nul : t
+  val zero : t
   val one : t
   val coef_dom : t -> elt
   val map : (elt -> elt) -> t -> t
@@ -35,6 +35,7 @@ module type PolyType = sig
   val pgcd : t -> t -> t
   val euclide : t -> t -> t * t * t
   val random : int -> t
+  val to_string : t -> string
   val print : t -> unit
 end
 
@@ -49,7 +50,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
   type t = elt list
 
   let one = [ Corps.one ]
-  let nul = []
+  let zero = []
   let map f p = List.map f p
 
   (** Attention : cette fonction ne rend pas one polynome unitaire,
@@ -61,21 +62,18 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     in
     List.rev (aux (List.rev u))
 
+  let to_string p = 
+    let rec aux k = function 
+      | [] -> "Zero"
+      | a :: s -> 
+        let str = Corps.to_string a ^ "X^" ^ Int.to_string k in
+        match s with
+          | [] -> str
+          | _ -> str ^ " + " ^ (aux (k+1) s)
+    in aux 0 p
+
   let print a =
-    let rec aux k = function
-      | [] -> ()
-      | a :: s ->
-        Corps.print a;
-        print_string "X^";
-        print_int k;
-        (match s with
-        | [] -> ()
-        | _ ->
-          print_string " + ";
-          aux (k + 1) s)
-    in
-    aux 0 a;
-    print_newline ()
+    to_string a |> print_string
 
   let rec decale u e =
     match u, e with
@@ -101,7 +99,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
         | [] -> [ e ]
         | a :: s -> e :: aux a 0 s)
     in
-    if u = nul then nul else aux (List.hd u) off (List.tl u)
+    if u = zero then zero else aux (List.hd u) off (List.tl u)
 
   let degre u =
     let v = normalise u in
@@ -146,7 +144,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
 
   let coef_dom u =
     let rec cherche = function
-      | [] -> failwith "coef_dom du polynome nul"
+      | [] -> failwith "coef_dom du polynome zero"
       | e :: s when e = Corps.zero -> cherche s
       | e :: _ -> e
     in
@@ -168,7 +166,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
 
   let rec div_elem u v =
     match u, v with
-    | _, [] -> failwith "division euclidienne par le polynome nul"
+    | _, [] -> failwith "division euclidienne par le polynome zero"
     | [], _ -> Corps.zero, []
     | [ a ], [ b ] -> Corps.div a b, []
     | a :: u1, b :: v1 ->

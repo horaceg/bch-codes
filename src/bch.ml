@@ -46,7 +46,7 @@ module BCH (Cf : CFT) (Taille : TT) = struct
         let u_suiv = Poly.sub u_prec (Poly.mul q u) in
         aux u u_suiv v v_suiv r r_suiv)
     in
-    aux Poly.one Poly.nul Poly.nul Poly.one a b
+    aux Poly.one Poly.zero Poly.zero Poly.one a b
 
   let chien_algo u =
     let d = Poly.degre u in
@@ -88,7 +88,7 @@ module BCH (Cf : CFT) (Taille : TT) = struct
 
   let decode_euclide y =
     let s = Poly.of_list (syndrome y) in
-    if s = Poly.nul
+    if s = Poly.zero
     then List.map Cf_ext.extraire (Poly.to_list (Poly.quotient y gene))
     else (
       let omega, lambda = euclide (Poly.decale Poly.one (Taille.delta - 1)) s in

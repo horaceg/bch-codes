@@ -52,13 +52,13 @@ module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
       else (
         let rec somme k s =
           if k = dim
-          then Poly.nul
+          then Poly.zero
           else (
             let smod = s %: u in
             smod +: somme (k + 1) (smod *: smod %: u))
         in
         let bmod = somme 0 r %: u in
-        if bmod = Poly.one || bmod = Poly.nul
+        if bmod = Poly.one || bmod = Poly.zero
         then cantor_p_pair u d
         else (
           let v = Poly.pgcd bmod u in

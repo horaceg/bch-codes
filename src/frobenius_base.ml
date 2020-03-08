@@ -10,6 +10,7 @@ module type BaseFieldT = sig
   val of_int : int -> t
   val to_list : t -> int list
   val elt_of_list_int : int list -> t
+  val to_string : t -> string
   val print : t -> unit
   val print_table : unit -> unit
   val add : t -> t -> t
@@ -63,10 +64,12 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
 
   let to_int a = a
 
-  let print u =
-    print_int u;
-    print_string "%";
-    print_int Taille.carac
+  let to_string u = 
+    let n = Int.to_string u in 
+    let p = Int.to_string Taille.carac in
+    n ^ "%" ^ p
+   
+  let print u = to_string u |> print_string 
 
   let print_table () = ()
 

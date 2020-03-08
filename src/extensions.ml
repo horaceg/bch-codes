@@ -9,7 +9,7 @@ end
 module type CFT = Frobenius.FieldT
 
 module type ExtT = sig
-  type t
+  include CFT
   type elt
 
   exception ExtraireImpossible
@@ -29,25 +29,11 @@ module type ExtT = sig
   val dim : int
   val cardinal : int
   val poly_irr : Poly.t
-  val zero : t
-  val of_int : int -> t
-  val to_int : t -> int
   val to_list : t -> int list
   val elt_of_list_int : int list -> t
   val extraire : t -> elt
   val incorporer : elt -> t
-  val one : t
-  val alpha : t
-  val add : t -> t -> t
-  val sub : t -> t -> t
-  val opp : t -> t
-  val mul : t -> t -> t
-  val inv : t -> t
-  val div : t -> t -> t
-  val pow : t -> int -> t
-  val print : t -> unit
   val print_table : unit -> unit
-  val random : unit -> t
 end
 
 module ExtensionNonOpt (CorpsBase : CFT) (Taille : TT) :
@@ -100,7 +86,7 @@ module ExtensionNonOpt (CorpsBase : CFT) (Taille : TT) :
   let to_list a = Conv.completer (Conv.list_of_poly a)
   let elt_of_list_int l = Poly.normalise (Poly.of_list (List.map CorpsBase.of_int l))
   let of_int j = Conv.poly_of_int j
-  let zero = Poly.nul
+  let zero = Poly.zero
   let one = Poly.one
   let alpha = Poly.decale one 1
   let add a b = Poly.add a b
@@ -117,17 +103,44 @@ module ExtensionNonOpt (CorpsBase : CFT) (Taille : TT) :
     let bm = inv b in
     mul a bm
 
-  let print a = Poly.print a
+  let to_string a = 
+    "test"
+    (* let fmt x y = 
+      x ^ "X" ^ y
+    Poly.to_list a
+    |> List.map CorpsBase.to_string
+    |> List.fold_left ( ^ ) ""
+ *)
+  let print a = to_string a |> print_string
   let random () = Poly.random dim
   let pow a n = Poly.powmod a n poly_irr
-  let incorporer a = if a <> CorpsBase.zero then Poly.monome a 0 else Poly.nul
+  let incorporer a = if a <> CorpsBase.zero then Poly.monome a 0 else Poly.zero
 
   let extraire a =
     let p = a in
     if Poly.degre p > 0 then raise ExtraireImpossible else Poly.coef_constant p
 end
 
-module ExtensionOpt (CorpsBase : CFT) (Taille : TT) : ExtT with type elt = CorpsBase.t =
+module type CycloType = Cyclo.CycloType
+
+module type ExtOptT = sig
+  include ExtT
+  module IntExt : sig
+    type t
+    (* val cm1 : int
+    val modpos : int -> int -> int
+    val add : t -> t -> t
+    val opp : t -> t
+    val mul : t -> t -> t *)
+    end
+  module Cyclo : CycloType with type poly = Poly.t
+  module Conv : sig
+    val table_add : IntExt.t array
+    val table_mul : Poly.t array
+  end
+end
+
+module ExtensionOpt (CorpsBase : CFT) (Taille : TT) : ExtOptT with type elt = CorpsBase.t =
 struct
   module ExtNonOpt = ExtensionNonOpt (CorpsBase) (Taille)
   include ExtNonOpt
@@ -165,7 +178,7 @@ struct
     include ExtNonOpt.Conv
 
     let tables =
-      let tmul = Array.make cardinal Poly.nul in
+      let tmul = Array.make cardinal Poly.zero in
       let tadd = Array.make cardinal IntExt.Inf in
       for i = 0 to cardinal - 2 do
         let rp = Poly.modulo (Poly.monome CorpsBase.one i) poly_irr in
@@ -217,7 +230,7 @@ struct
       print_newline ()
     done
 
-  let zero = { rep_cycl = IntExt.Inf; rep_poly = Poly.nul }
+  let zero = { rep_cycl = IntExt.Inf; rep_poly = Poly.zero }
   let one = { rep_cycl = IntExt.Fini 0; rep_poly = Poly.one }
   let alpha = { rep_cycl = IntExt.Fini 1; rep_poly = Conv.poly_of_cycl (IntExt.Fini 1) }
 
@@ -247,12 +260,11 @@ struct
     let bm = inv b in
     mul a bm
 
-  let print a =
-    match a.rep_cycl with
-    | IntExt.Inf -> print_int 0
-    | IntExt.Fini k ->
-      print_string "a^";
-      print_int k
+  let to_string a = match a.rep_cycl with
+    | IntExt.Inf -> "0"
+    | IntExt.Fini k -> "a^" ^ (Int.to_string k)
+
+  let print a = to_string a |> print_string
 
   let random () =
     let i = Random.int cardinal in
@@ -265,7 +277,7 @@ struct
     { rep_cycl = c; rep_poly = p }
 
   let incorporer a =
-    let p = if a <> CorpsBase.zero then Poly.monome a 0 else Poly.nul in
+    let p = if a <> CorpsBase.zero then Poly.monome a 0 else Poly.zero in
     let c = Conv.cycl_of_poly p in
     { rep_cycl = c; rep_poly = p }
 
