@@ -103,14 +103,7 @@ module ExtensionNonOpt (CorpsBase : CFT) (Taille : TT) :
     let bm = inv b in
     mul a bm
 
-  let to_string a = 
-    "test"
-    (* let fmt x y = 
-      x ^ "X" ^ y
-    Poly.to_list a
-    |> List.map CorpsBase.to_string
-    |> List.fold_left ( ^ ) ""
- *)
+  let to_string = Poly.to_string
   let print a = to_string a |> print_string
   let random () = Poly.random dim
   let pow a n = Poly.powmod a n poly_irr
