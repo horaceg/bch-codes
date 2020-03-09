@@ -41,7 +41,7 @@ module ExtensionNonOpt (CorpsBase : CFT) (Taille : TT) :
   type elt = CorpsBase.t
 
   module Poly = Polynome.Polynome (CorpsBase)
-  module Cz = Cantorzass.Cantorzass (Poly)
+  module Cz = Cantorzass.Cantorzass (CorpsBase) (Poly)
   module Cyclo = Cyclo.Cyclo (Poly)
 
   exception ExtraireImpossible

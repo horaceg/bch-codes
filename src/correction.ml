@@ -133,7 +133,7 @@ let open_bmp_matrix str =
       let r = input_byte ic in
       resultat.(x).(y) <- r, v, b
     done;
-    for i = 1 to pad do
+    for _ = 1 to pad do
       ignore (input_byte ic)
     done
   done;
@@ -154,7 +154,7 @@ let write_bmp matrix str =
       output_byte oc r;
       if x = taille_x - 1
       then
-        for k = 0 to pad - 1 do
+        for _ = 0 to pad - 1 do
           output_byte oc 0
         done
     done

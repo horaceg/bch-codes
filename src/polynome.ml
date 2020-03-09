@@ -4,8 +4,6 @@ module type PolyType = sig
   type t
   type elt
 
-  val carac : int
-  val cardinal : int
   val of_list : elt list -> t
   val to_list : t -> elt list
   val zero : t
@@ -42,14 +40,11 @@ end
 module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
   type elt = Corps.t
 
-  let carac = Corps.carac
-  let cardinal = Corps.cardinal
-
   type t = elt list
 
   let one = [ Corps.one ]
   let zero = []
-  let map f p = List.map f p
+  let map = List.map
 
   (** Attention : cette fonction ne rend pas one polynome unitaire,
         		mais enleve les zeros superflus *)
@@ -126,7 +121,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     | [], x :: v' -> Corps.neg x :: sub1 [] v'
     | a :: u', b :: v' -> (Corps.sub a b) :: sub1 u' v'
 
-  let rec sub u v = normalise (sub1 u v)
+  let sub u v = normalise (sub1 u v)
   let mul_par_scal u s = if s = Corps.zero then [] else List.map (fun x -> Corps.mul x s) u
   let neg u = mul_par_scal u (Corps.neg Corps.one)
 
@@ -161,7 +156,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
         aux (add q (monome (Corps.mul dom_r inv_dom_v) (deg_r - deg_v))) (sub r mq))
     in
     aux [] u
-
+(* 
   let rec div_elem u v =
     match u, v with
     | _, [] -> failwith "division euclidienne par le polynome zero"
@@ -169,14 +164,14 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     | [ a ], [ b ] -> Corps.div a b, []
     | a :: u1, b :: v1 ->
       let c, r1 = div_elem u1 v1 in
-      c, (Corps.sub a (Corps.mul b c)) :: r1
+      c, (Corps.sub a (Corps.mul b c)) :: r1 *)
 
   let quotient u v = fst (division u v)
   let modulo u v = snd (division u v)
   let unitaire u = mul_par_scal u (Corps.inv (coef_dom u))
 
   let rec pgcd a b =
-    let rec aux a = function
+    let aux a = function
       | [] -> a
       | b -> pgcd b (modulo a b)
     in

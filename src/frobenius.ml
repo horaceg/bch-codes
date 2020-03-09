@@ -10,7 +10,7 @@ end
 module Frobenius (Taille : TailleT) : FieldT = struct
   module Base = FrobeniusBase (Taille)
   module Poly = Polynome.Polynome (Base)
-  module Cz = Cantorzass.Cantorzass (Poly)
+  module Cz = Cantorzass.Cantorzass (Base) (Poly)
   module Cyclo = Cyclo.Cyclo (Poly)
   include Base
   let poly_irr =

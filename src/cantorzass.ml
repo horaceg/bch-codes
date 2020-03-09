@@ -1,4 +1,5 @@
 module type PolyType = Polynome.PolyType
+module type BaseFieldT = Frobenius_base.BaseFieldT
 
 module type CzType = sig
   type poly
@@ -7,12 +8,11 @@ module type CzType = sig
   val factorisation : poly -> int -> poly list
 end
 
-module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
+module Cantorzass (Field: BaseFieldT) (Poly : PolyType) : CzType with type poly = Poly.t = struct
   type poly = Poly.t
 
-  let moins_un = Poly.neg Poly.one
-  let carac = Poly.carac
-  let cardinal = Poly.cardinal
+  let carac = Field.carac
+  let cardinal = Field.cardinal
 
   let dim =
     let rec aux i k = if i > 0 then aux (i / carac) (k + 1) else k + 1 in

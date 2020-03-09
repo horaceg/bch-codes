@@ -66,7 +66,7 @@ let read_entete ic =
 
 let open_bmp_matrix str =
   let ic = open_in_bin str in
-  let offset, taille_x, taille_y, pad = read_entete ic in
+  let _, taille_x, taille_y, pad = read_entete ic in
   let resultat = Array.make_matrix taille_x taille_y (0, 0, 0) in
   for y = taille_y - 1 downto 0 do
     for x = 0 to taille_x - 1 do
@@ -75,7 +75,7 @@ let open_bmp_matrix str =
       let r = input_byte ic in
       resultat.(x).(y) <- r, v, b
     done;
-    for i = 1 to pad do
+    for _ = 1 to pad do
       ignore (input_byte ic)
     done
   done;
@@ -96,7 +96,7 @@ let write_bmp matrix str =
       output_byte oc r;
       if x = taille_x - 1
       then
-        for k = 0 to pad - 1 do
+        for _ = 0 to pad - 1 do
           output_byte oc 0
         done
     done
