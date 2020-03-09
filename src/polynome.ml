@@ -44,8 +44,6 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
 
   let carac = Corps.carac
   let cardinal = Corps.cardinal
-  let inv = Corps.inv
-  let ( /% ) = Corps.div
 
   type t = elt list
 
@@ -151,7 +149,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     cherche (List.rev u)
 
   let division (u : t) (v : t) =
-    let inv_dom_v = inv (coef_dom v) in
+    let inv_dom_v = Corps.inv (coef_dom v) in
     let deg_v = degre v in
     let rec aux q r =
       let deg_r = degre r in
@@ -175,7 +173,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
 
   let quotient u v = fst (division u v)
   let modulo u v = snd (division u v)
-  let unitaire u = mul_par_scal u (inv (coef_dom u))
+  let unitaire u = mul_par_scal u (Corps.inv (coef_dom u))
 
   let rec pgcd a b =
     let rec aux a = function
@@ -194,7 +192,7 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
         d, v, sub u (mul q v)
     in
     let d, u, v = aux a b in
-    let c = inv (coef_dom d) in
+    let c = Corps.inv (coef_dom d) in
     mul_par_scal d c, mul_par_scal u c, mul_par_scal v c
 
   let rec pow u = function
