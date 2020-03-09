@@ -80,7 +80,7 @@ module BCH (Cf : CFT) (Taille : TT) = struct
         let o = Poly.evaluer omega x_j_inv in
         let l = Poly.evaluer lambda_d x_j_inv in
         ( (n - a) mod n
-        , Cf_ext.opp
+        , Cf_ext.neg
             (Cf_ext.mul (Cf_ext.div o l) (Cf_ext.mul (Cf_ext.pow x_j_inv b) x_j)) )
         :: aux s
     in

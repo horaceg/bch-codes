@@ -86,7 +86,7 @@ module RS (Corps : CFT) (Taille : TT) = struct
         let x_j_inv = Cf.pow beta a in
         let o = Poly.evaluer omega x_j_inv in
         let l = Poly.evaluer lambda_d x_j_inv in
-        ((n - a) mod n, Cf.opp (Cf.div o l)) :: aux s
+        ((n - a) mod n, Cf.neg (Cf.div o l)) :: aux s
     in
     aux racine
 

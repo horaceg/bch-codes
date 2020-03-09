@@ -21,7 +21,7 @@ module type PolyType = sig
   val coef_constant : t -> elt
   val degre : t -> int
   val derive : t -> t
-  val opp : t -> t
+  val neg : t -> t
   val add : t -> t -> t
   val sub : t -> t -> t
   val mul : t -> t -> t
@@ -123,12 +123,12 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
   let rec sub1 u v =
     match u, v with
     | _, [] -> u
-    | [], x :: v' -> Corps.opp x :: sub1 [] v'
+    | [], x :: v' -> Corps.neg x :: sub1 [] v'
     | a :: u', b :: v' -> (Corps.sub a b) :: sub1 u' v'
 
   let rec sub u v = normalise (sub1 u v)
   let mul_par_scal u s = if s = Corps.zero then [] else List.map (fun x -> Corps.mul x s) u
-  let opp u = mul_par_scal u (Corps.opp Corps.one)
+  let neg u = mul_par_scal u (Corps.neg Corps.one)
 
   let rec mul u v =
     match u, v with

@@ -91,7 +91,7 @@ module ExtensionNonOpt (CorpsBase : CFT) (Taille : TT) :
   let alpha = Poly.decale one 1
   let add a b = Poly.add a b
   let sub a b = Poly.sub a b
-  let opp a = sub zero a
+  let neg a = sub zero a
   let print_table () = ()
   let mul a b = Poly.modulo (Poly.mul a b) poly_irr
 
@@ -123,7 +123,7 @@ module type ExtOptT = sig
     (* val cm1 : int
     val modpos : int -> int -> int
     val add : t -> t -> t
-    val opp : t -> t
+    val neg : t -> t
     val mul : t -> t -> t *)
     end
   module Cyclo : CycloType with type poly = Poly.t
@@ -156,7 +156,7 @@ struct
       | _, Inf -> Inf
       | Fini x, Fini y -> Fini (modpos (x + y) cm1)
 
-    let opp = function
+    let neg = function
       | Inf -> failwith "division par zero"
       | Fini x -> Fini (modpos (-x) cm1)
 
@@ -237,7 +237,7 @@ struct
     let c = Conv.cycl_of_poly p in
     { rep_cycl = c; rep_poly = p }
 
-  let opp a = sub zero a
+  let neg a = sub zero a
 
   let mul a b =
     let c = IntExt.add a.rep_cycl b.rep_cycl in
@@ -245,7 +245,7 @@ struct
     { rep_cycl = c; rep_poly = p }
 
   let inv a =
-    let c = IntExt.opp a.rep_cycl in
+    let c = IntExt.neg a.rep_cycl in
     let p = Conv.poly_of_cycl c in
     { rep_cycl = c; rep_poly = p }
 

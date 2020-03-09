@@ -15,7 +15,7 @@ module type BaseFieldT = sig
   val print_table : unit -> unit
   val add : t -> t -> t
   val sub : t -> t -> t
-  val opp : t -> t
+  val neg : t -> t
   val mul : t -> t -> t
   val inv : t -> t
   val div : t -> t -> t
@@ -85,7 +85,7 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
     | 1, u, _ -> of_int u
     | _ -> failwith "elt non inversible"
 
-  let opp x = sub zero x
+  let neg x = sub zero x
   let div a b = mul a (inv b)
 
   let pow a n =

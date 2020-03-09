@@ -10,7 +10,7 @@ end
 module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
   type poly = Poly.t
 
-  let moins_un = Poly.opp Poly.one
+  let moins_un = Poly.neg Poly.one
   let carac = Poly.carac
   let cardinal = Poly.cardinal
 
