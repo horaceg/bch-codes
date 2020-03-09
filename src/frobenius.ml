@@ -16,9 +16,10 @@ module Frobenius (Taille : TailleT) : FieldT = struct
   module Cyclo = Cyclo.Cyclo (Poly)
   include Base
 
-  let poly_irr =
-    let poly_cyclo = Cyclo.cyclo (cardinal - 1) in
-    Cz.cantor_zassenhaus poly_cyclo dim
+  (*
+     let poly_irr =
+       let poly_cyclo = Cyclo.cyclo (cardinal - 1) in
+       Cz.cantor_zassenhaus poly_cyclo dim *)
 
   let alpha = of_int (if Taille.carac = 2 then 1 else if Taille.carac = 3 then 2 else 3)
 end

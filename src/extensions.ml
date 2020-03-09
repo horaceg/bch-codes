@@ -217,10 +217,11 @@ module ExtensionOpt (CorpsBase : CFT) (Taille : TT) :
 
   let print_alpha_i i = Poly.print (Conv.poly_of_cycl (IntExt.Fini i))
 
-  let print_cycle_i i =
-    match Conv.cycl_of_poly (Conv.poly_of_cycl (IntExt.Fini i)) with
-    | IntExt.Inf -> print_string "inf"
-    | IntExt.Fini x -> print_int x
+  (*
+     let print_cycle_i i =
+       match Conv.cycl_of_poly (Conv.poly_of_cycl (IntExt.Fini i)) with
+       | IntExt.Inf -> print_string "inf"
+       | IntExt.Fini x -> print_int x *)
 
   let print_table () =
     for i = 0 to cardinal - 2 do

@@ -34,7 +34,7 @@ module Cyclo (Poly : PolyType) = struct
       | [] -> phi
       | p :: s -> aux (Poly.quotient (Poly.translate (p - 1) phi) phi) s
     in
-    Poly.translate
-      ((n / m) - 1)
-      (aux (Poly.add (Poly.neg Poly.one) (Poly.decale Poly.one 1)) prem)
+    let x = Poly.decale Poly.one 1 in
+    let minus_one = Poly.neg Poly.one in
+    prem |> aux (Poly.add minus_one x) |> Poly.translate ((n / m) - 1)
 end
