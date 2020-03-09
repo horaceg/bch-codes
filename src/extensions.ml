@@ -26,9 +26,7 @@ module type ExtT = sig
     val completer : int list -> int list
   end
 
-  val carac : int
   val dim : int
-  val cardinal : int
   val poly_irr : Poly.t
   val to_list : t -> int list
   val elt_of_list_int : int list -> t
@@ -128,6 +126,7 @@ module type ExtOptT = sig
        val add : t -> t -> t
        val neg : t -> t
        val mul : t -> t -> t *)
+    val to_string : t -> string
   end
 
   module Cyclo : CycloType with type poly = Poly.t
@@ -170,6 +169,10 @@ module ExtensionOpt (CorpsBase : CFT) (Taille : TT) :
       | Inf, _ -> Inf
       | _, Inf -> Inf
       | Fini x, Fini y -> Fini (modpos (x * y) cm1)
+
+    let to_string = function
+      | Fini i -> Int.to_string i
+      | Inf -> "inf"
   end
 
   module Conv = struct
@@ -260,9 +263,12 @@ module ExtensionOpt (CorpsBase : CFT) (Taille : TT) :
     mul a bm
 
   let to_string a =
+    let cycl = 
     match a.rep_cycl with
     | IntExt.Inf -> "0"
     | IntExt.Fini k -> "a^" ^ Int.to_string k
+  in
+  cycl ^ " : " ^ Poly.to_string a.rep_poly
 
   let print a = to_string a |> print_string
 
