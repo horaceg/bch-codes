@@ -18,12 +18,6 @@ module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
     let rec aux i k = if i > 0 then aux (i / carac) (k + 1) else k + 1 in
     aux cardinal 0
 
-  let ( +: ) a b = Poly.add a b
-  let ( -: ) a b = Poly.sub a b
-  let ( *: ) a b = Poly.mul a b
-  let ( /: ) a b = Poly.quotient a b
-  let ( %: ) a b = Poly.modulo a b
-
   let rec cantor_p_impair u d =
     if Poly.degre u = d
     then u
@@ -34,35 +28,42 @@ module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
       then cantor_p_impair u d
       else (
         let b = Poly.powmod r ((cardinal - 1) / 2) u in
-        let bmod = b %: u in
+        let bmod = Poly.modulo b u in
         if bmod = Poly.one
         then cantor_p_impair u d
         else (
-          let v = Poly.pgcd (b -: Poly.one) u in
+          let v = Poly.pgcd (Poly.sub b Poly.one) u in
           if Poly.degre v >= d then cantor_p_impair v d else cantor_p_impair u d)))
 
   let rec cantor_p_pair u d =
     if Poly.degre u = d
     then u
-    else (
+    else begin
       let n = Poly.degre u in
       let r = Poly.random n in
       if Poly.degre r < 2
       then cantor_p_pair u d
-      else (
+      else begin
         let rec somme k s =
           if k = dim
           then Poly.zero
-          else (
-            let smod = s %: u in
-            smod +: somme (k + 1) (smod *: smod %: u))
+          else begin
+            let smod = Poly.modulo s u in
+            Poly.modulo smod u
+            |> Poly.mul smod 
+            |> somme (k + 1)
+            |> Poly.add smod
+          end
         in
-        let bmod = somme 0 r %: u in
+        let bmod = Poly.modulo (somme 0 r) u in
         if bmod = Poly.one || bmod = Poly.zero
         then cantor_p_pair u d
-        else (
+        else begin
           let v = Poly.pgcd bmod u in
-          if Poly.degre v >= d then cantor_p_pair v d else cantor_p_pair u d)))
+          if Poly.degre v >= d then cantor_p_pair v d else cantor_p_pair u d
+        end
+      end
+    end
 
   let cantor_zassenhaus u d =
     if carac mod 2 = 0 then cantor_p_pair u d else cantor_p_impair u d
@@ -71,6 +72,6 @@ module Cantorzass (Poly : PolyType) : CzType with type poly = Poly.t = struct
     if Poly.degre u > 1
     then (
       let v = cantor_zassenhaus u d in
-      v :: factorisation (u /: v) d)
+      v :: factorisation (Poly.quotient u v) d)
     else [ u ]
 end
