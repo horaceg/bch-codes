@@ -1,4 +1,4 @@
-module type CorpsType = Frobenius_base.BaseFieldT
+module type CorpsType = PrimeField_base.BaseFieldT
 
 module type PolyType = sig
   type t

@@ -9,8 +9,8 @@ module Taille = struct
   let var = 400
 end
 
-module Frob = Frobenius.Frobenius (Taille)
-module Ext = Extensions.ExtensionOpt (Frob) (Taille)
+module PrimeF = PrimeField.PrimeField (Taille)
+module Ext = Extensions.ExtensionOpt (PrimeF) (Taille)
 module R = Reedsolomon.RS (Ext) (Taille)
 module Mess = Bruitage.Messages (R) (Taille)
 module Img = Img.Img

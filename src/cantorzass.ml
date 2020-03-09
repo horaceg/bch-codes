@@ -1,5 +1,5 @@
 module type PolyType = Polynome.PolyType
-module type BaseFieldT = Frobenius_base.BaseFieldT
+module type BaseFieldT = PrimeField_base.BaseFieldT
 
 module type CzType = sig
   type poly

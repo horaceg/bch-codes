@@ -12,7 +12,7 @@ module type CT = sig
   val k : int
   val n : int
 
-  module Cf : Frobenius.FieldT
+  module Cf : PrimeField.FieldT
 
   module Poly : sig
     type elt = Cf.t

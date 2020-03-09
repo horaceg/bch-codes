@@ -1,7 +1,7 @@
-module type BaseFieldT = Frobenius_base.BaseFieldT
-module type TailleT = Frobenius_base.TailleT
+module type BaseFieldT = PrimeField_base.BaseFieldT
+module type TailleT = PrimeField_base.TailleT
 
-module FrobeniusBase = Frobenius_base.FrobeniusBase
+module PrimeFieldBase = PrimeField_base.PrimeFieldBase
 
 module type FieldT = sig
   include BaseFieldT
@@ -9,8 +9,8 @@ module type FieldT = sig
   val alpha : t
 end
 
-module Frobenius (Taille : TailleT) : FieldT = struct
-  module Base = FrobeniusBase (Taille)
+module PrimeField (Taille : TailleT) : FieldT = struct
+  module Base = PrimeFieldBase (Taille)
   module Poly = Polynome.Polynome (Base)
   module Cz = Cantorzass.Cantorzass (Base) (Poly)
   module Cyclo = Cyclo.Cyclo (Poly)

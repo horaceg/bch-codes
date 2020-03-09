@@ -6,7 +6,7 @@ module type TT = sig
   val dim : int
 end
 
-module type CFT = Frobenius.FieldT
+module type CFT = PrimeField.FieldT
 
 module type ExtT = sig
   include CFT

@@ -27,7 +27,7 @@ module type TailleT = sig
   val carac : int
 end
 
-module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
+module PrimeFieldBase (Taille : TailleT) : BaseFieldT = struct
   let rec bezout a b =
     match b with
     | 0 -> a, 1, 0
@@ -47,7 +47,7 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
     match l with
     | [] -> 0
     | [ a ] -> a
-    | _ -> failwith "element of list int : Frob"
+    | _ -> failwith "element of list int : PrimeF"
 
   let to_list a = [ a ]
 

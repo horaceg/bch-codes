@@ -1,4 +1,4 @@
-module type CFT = Frobenius.FieldT
+module type CFT = PrimeField.FieldT
 
 module type TT = sig
   val n : int
