@@ -51,10 +51,6 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
 
   let to_list a = [ a ]
 
-  let ( % ) a b =
-    let x = a mod b in
-    if x >= 0 then x else b + x
-
   let of_int i =
     match i mod carac with
     | x when x >= 0 -> x
