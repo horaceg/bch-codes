@@ -85,7 +85,7 @@ module Decomposition (Fq : CFT) (Taille : TT) = struct
       |> calcul_consecutifs
       |> List.sort compare
       |> aux (-1)
-      
+
     let meilleur_ratio cl_delta n =
       let norm a b = if a > b then b - 1 else a in
       let rapport (a, b) =

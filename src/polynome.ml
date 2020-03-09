@@ -39,7 +39,6 @@ end
 
 module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
   type elt = Corps.t
-
   type t = elt list
 
   let one = [ Corps.one ]
@@ -55,18 +54,18 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     in
     List.rev (aux (List.rev u))
 
-  let to_string p = 
-    let rec aux k = function 
+  let to_string p =
+    let rec aux k = function
       | [] -> "Zero"
-      | a :: s -> 
+      | a :: s ->
         let str = Corps.to_string a ^ "X^" ^ Int.to_string k in
-        match s with
-          | [] -> str
-          | _ -> str ^ " + " ^ (aux (k+1) s)
-    in aux 0 p
+        (match s with
+        | [] -> str
+        | _ -> str ^ " + " ^ aux (k + 1) s)
+    in
+    aux 0 p
 
-  let print a =
-    to_string a |> print_string
+  let print a = to_string a |> print_string
 
   let rec decale u e =
     match u, e with
@@ -119,10 +118,13 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
     match u, v with
     | _, [] -> u
     | [], x :: v' -> Corps.neg x :: sub1 [] v'
-    | a :: u', b :: v' -> (Corps.sub a b) :: sub1 u' v'
+    | a :: u', b :: v' -> Corps.sub a b :: sub1 u' v'
 
   let sub u v = normalise (sub1 u v)
-  let mul_par_scal u s = if s = Corps.zero then [] else List.map (fun x -> Corps.mul x s) u
+
+  let mul_par_scal u s =
+    if s = Corps.zero then [] else List.map (fun x -> Corps.mul x s) u
+
   let neg u = mul_par_scal u (Corps.neg Corps.one)
 
   let rec mul u v =
@@ -156,15 +158,16 @@ module Polynome (Corps : CorpsType) : PolyType with type elt = Corps.t = struct
         aux (add q (monome (Corps.mul dom_r inv_dom_v) (deg_r - deg_v))) (sub r mq))
     in
     aux [] u
-(* 
-  let rec div_elem u v =
-    match u, v with
-    | _, [] -> failwith "division euclidienne par le polynome zero"
-    | [], _ -> Corps.zero, []
-    | [ a ], [ b ] -> Corps.div a b, []
-    | a :: u1, b :: v1 ->
-      let c, r1 = div_elem u1 v1 in
-      c, (Corps.sub a (Corps.mul b c)) :: r1 *)
+
+  (*
+     let rec div_elem u v =
+       match u, v with
+       | _, [] -> failwith "division euclidienne par le polynome zero"
+       | [], _ -> Corps.zero, []
+       | [ a ], [ b ] -> Corps.div a b, []
+       | a :: u1, b :: v1 ->
+         let c, r1 = div_elem u1 v1 in
+         c, (Corps.sub a (Corps.mul b c)) :: r1 *)
 
   let quotient u v = fst (division u v)
   let modulo u v = snd (division u v)

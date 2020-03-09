@@ -10,6 +10,7 @@ module type CFT = Frobenius.FieldT
 
 module type ExtT = sig
   include CFT
+
   type elt
 
   exception ExtraireImpossible
@@ -118,23 +119,27 @@ module type CycloType = Cyclo.CycloType
 
 module type ExtOptT = sig
   include ExtT
+
   module IntExt : sig
     type t
+
     (* val cm1 : int
-    val modpos : int -> int -> int
-    val add : t -> t -> t
-    val neg : t -> t
-    val mul : t -> t -> t *)
-    end
+       val modpos : int -> int -> int
+       val add : t -> t -> t
+       val neg : t -> t
+       val mul : t -> t -> t *)
+  end
+
   module Cyclo : CycloType with type poly = Poly.t
+
   module Conv : sig
     val table_add : IntExt.t array
     val table_mul : Poly.t array
   end
 end
 
-module ExtensionOpt (CorpsBase : CFT) (Taille : TT) : ExtOptT with type elt = CorpsBase.t =
-struct
+module ExtensionOpt (CorpsBase : CFT) (Taille : TT) :
+  ExtOptT with type elt = CorpsBase.t = struct
   module ExtNonOpt = ExtensionNonOpt (CorpsBase) (Taille)
   include ExtNonOpt
 
@@ -185,9 +190,9 @@ struct
     let cycl_of_poly u = table_add.(int_of_poly u)
 
     let poly_of_cycl c =
-      table_mul.(match c with
-                  | IntExt.Inf -> cardinal - 1
-                  | IntExt.Fini x -> x)
+      table_mul.((match c with
+                 | IntExt.Inf -> cardinal - 1
+                 | IntExt.Fini x -> x))
   end
 
   type t =
@@ -253,9 +258,10 @@ struct
     let bm = inv b in
     mul a bm
 
-  let to_string a = match a.rep_cycl with
+  let to_string a =
+    match a.rep_cycl with
     | IntExt.Inf -> "0"
-    | IntExt.Fini k -> "a^" ^ (Int.to_string k)
+    | IntExt.Fini k -> "a^" ^ Int.to_string k
 
   let print a = to_string a |> print_string
 

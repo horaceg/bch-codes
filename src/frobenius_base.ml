@@ -39,10 +39,8 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
 
   let zero = 0
   let one = 1
-  
   let carac = Taille.carac
   let dim = 1
-
   let cardinal = carac
 
   let elt_of_list_int l =
@@ -64,17 +62,14 @@ module FrobeniusBase (Taille : TailleT) : BaseFieldT = struct
 
   let to_int a = a
 
-  let to_string u = 
-    let n = Int.to_string u in 
+  let to_string u =
+    let n = Int.to_string u in
     let p = Int.to_string Taille.carac in
     n ^ "%" ^ p
-   
-  let print u = to_string u |> print_string 
 
+  let print u = to_string u |> print_string
   let print_table () = ()
-
-  let iso op_int a b =
-    of_int (op_int a b)
+  let iso op_int a b = of_int (op_int a b)
 
   let add a b = iso ( + ) a b
   and mul a b = iso ( * ) a b

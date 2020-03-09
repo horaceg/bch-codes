@@ -8,7 +8,8 @@ module type CzType = sig
   val factorisation : poly -> int -> poly list
 end
 
-module Cantorzass (Field: BaseFieldT) (Poly : PolyType) : CzType with type poly = Poly.t = struct
+module Cantorzass (Field : BaseFieldT) (Poly : PolyType) :
+  CzType with type poly = Poly.t = struct
   type poly = Poly.t
 
   let carac = Field.carac
@@ -38,32 +39,25 @@ module Cantorzass (Field: BaseFieldT) (Poly : PolyType) : CzType with type poly 
   let rec cantor_p_pair u d =
     if Poly.degre u = d
     then u
-    else begin
+    else (
       let n = Poly.degre u in
       let r = Poly.random n in
       if Poly.degre r < 2
       then cantor_p_pair u d
-      else begin
+      else (
         let rec somme k s =
           if k = dim
           then Poly.zero
-          else begin
+          else (
             let smod = Poly.modulo s u in
-            Poly.modulo smod u
-            |> Poly.mul smod 
-            |> somme (k + 1)
-            |> Poly.add smod
-          end
+            Poly.modulo smod u |> Poly.mul smod |> somme (k + 1) |> Poly.add smod)
         in
         let bmod = Poly.modulo (somme 0 r) u in
         if bmod = Poly.one || bmod = Poly.zero
         then cantor_p_pair u d
-        else begin
+        else (
           let v = Poly.pgcd bmod u in
-          if Poly.degre v >= d then cantor_p_pair v d else cantor_p_pair u d
-        end
-      end
-    end
+          if Poly.degre v >= d then cantor_p_pair v d else cantor_p_pair u d)))
 
   let cantor_zassenhaus u d =
     if carac mod 2 = 0 then cantor_p_pair u d else cantor_p_impair u d
