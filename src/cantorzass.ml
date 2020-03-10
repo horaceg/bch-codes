@@ -8,8 +8,8 @@ module type CzType = sig
   val factorisation : poly -> int -> poly list
 end
 
-module Cantorzass (Field : FieldT) (Poly : PolyType) :
-  CzType with type poly = Poly.t = struct
+module Cantorzass (Field : FieldT) (Poly : PolyType) : CzType with type poly = Poly.t =
+struct
   type poly = Poly.t
 
   let carac = Field.carac

@@ -263,12 +263,12 @@ module ExtensionOpt (CorpsBase : CFT) (Taille : TT) :
     mul a bm
 
   let to_string a =
-    let cycl = 
-    match a.rep_cycl with
-    | IntExt.Inf -> "0"
-    | IntExt.Fini k -> "a^" ^ Int.to_string k
-  in
-  cycl ^ " : " ^ Poly.to_string a.rep_poly
+    let cycl =
+      match a.rep_cycl with
+      | IntExt.Inf -> "0"
+      | IntExt.Fini k -> "a^" ^ Int.to_string k
+    in
+    cycl ^ " : " ^ Poly.to_string a.rep_poly
 
   let print a = to_string a |> print_string
 

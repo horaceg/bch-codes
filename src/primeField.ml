@@ -65,7 +65,6 @@ module PrimeField (Taille : TailleT) : FieldT = struct
     n ^ "%" ^ p
 
   let iso op_int a b = of_int (op_int a b)
-
   let add a b = iso ( + ) a b
   let mul a b = iso ( * ) a b
   let sub a b = iso ( - ) a b
@@ -87,39 +86,41 @@ module PrimeField (Taille : TailleT) : FieldT = struct
     aux a n
 
   let random () = of_int (Random.int carac)
-  
-  let is_prime p = 
-    if p = 2 then true  
-    else
-      let rec aux n = match n with
+
+  let is_prime p =
+    if p = 2
+    then true
+    else (
+      let rec aux n =
+        match n with
         | a when a * a >= p -> true
         | a when p mod a = 0 -> false
         | _ -> false || aux (n + 2)
-      in 
-      p mod 2 = 1 && aux 3
-  
+      in
+      p mod 2 = 1 && aux 3)
+
   let find_primitives p =
-    if not (is_prime p) then failwith "The cardinal of a prime field must be a prime"
-    else
-      let rec order a n = match n with
+    if not (is_prime p)
+    then failwith "The cardinal of a prime field must be a prime"
+    else (
+      let rec order a n =
+        match n with
         | 1 -> 1
         | _ -> 1 + order a (n * a mod p)
       in
-      List.init (p - 1) succ
-      |> List.filter (fun k -> order k k = p - 1)
+      List.init (p - 1) succ |> List.filter (fun k -> order k k = p - 1))
 
   let alpha = find_primitives carac |> List.hd |> of_int
   let print u = to_string u |> print_string
+
   let print_table () =
-    let rec aux i = match i with
+    let rec aux i =
+      match i with
       | a when a = carac -> ()
-      | _ -> 
-        "a^" 
-        ^ Int.to_string i 
-        ^ ": " 
-        ^ to_string (pow alpha i) 
-        |> print_string ; 
-        print_newline() ;
+      | _ ->
+        "a^" ^ Int.to_string i ^ ": " ^ to_string (pow alpha i) |> print_string;
+        print_newline ();
         aux (i + 1)
-    in aux 1
+    in
+    aux 1
 end
