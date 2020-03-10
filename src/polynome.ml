@@ -1,4 +1,4 @@
-module type CorpsType = PrimeField_base.BaseFieldT
+module type CorpsType = PrimeField.FieldT
 
 module type PolyType = sig
   type t

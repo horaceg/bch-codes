@@ -1,5 +1,5 @@
 module type PolyType = Polynome.PolyType
-module type BaseFieldT = PrimeField_base.BaseFieldT
+module type FieldT = PrimeField.FieldT
 
 module type CzType = sig
   type poly
@@ -8,7 +8,7 @@ module type CzType = sig
   val factorisation : poly -> int -> poly list
 end
 
-module Cantorzass (Field : BaseFieldT) (Poly : PolyType) :
+module Cantorzass (Field : FieldT) (Poly : PolyType) :
   CzType with type poly = Poly.t = struct
   type poly = Poly.t
 
